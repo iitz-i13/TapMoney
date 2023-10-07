@@ -9,12 +9,6 @@ const CategorizePage = () => {
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('金額入力画面')}>
-        <Text>Go to Input Page</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.button}
         onPress={() => navigation.navigate('残高確認画面')}>
         <Text>Go to Result Page</Text>
       </TouchableOpacity>
