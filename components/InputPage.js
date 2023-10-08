@@ -69,7 +69,7 @@ const InputPage = () => {
       </View>
       <TouchableOpacity
         style={styles.centerButton}  // 修正したスタイル名
-        onPress={() => navigation.navigate('属性選択画面')}>
+        onPress={() => navigation.navigate('属性選択画面', { amount: '1000' })}> 
         <Text>Go to Categorize Page</Text>
       </TouchableOpacity>
 
