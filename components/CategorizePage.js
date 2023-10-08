@@ -2,11 +2,16 @@ import React from 'react';
 import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
-const CategorizePage = () => {
+const CategorizePage = ({ route }) => {
   const navigation = useNavigation();
+
+  // InputPageから渡された数字を取得
+  const receivedAmount = route.params?.amount || '0';  // <-- ここで数字を取得
 
   return (
     <View style={styles.container}>
+      <Text style={styles.amountText}>{receivedAmount} 円</Text>
+
       <TouchableOpacity
         style={[styles.button, styles.expenseButton]}
         onPress={() => navigation.navigate('残高確認画面')}>
