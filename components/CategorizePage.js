@@ -1,17 +1,10 @@
 import React from 'react';
-import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {StyleSheet, View, Text, } from 'react-native';
 
 const CategorizePage = () => {
-  const navigation = useNavigation();
-
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate('残高確認画面')}>
-        <Text>Go to Result Page</Text>
-      </TouchableOpacity>
+      <Text style={styles.text}>bbb</Text>
     </View>
   );
 };
@@ -22,12 +15,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  button: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: 'lightgray',
-    borderRadius: 5,
   },
 });
 
