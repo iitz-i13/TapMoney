@@ -5,6 +5,7 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 const ResultPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const [records, setRecords] = useState([]); // 記録を保存するためのstate
 
   // CategorizePageから渡された情報を取得
   const timestamp = route.params?.timestamp;
@@ -14,7 +15,7 @@ const ResultPage = () => {
   // タイムスタンプを月・日形式で表示するヘルパー関数
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
-    return `${date.getFullYear()}.{date.getMonth() + 1}.${date.getDate()}`;
+    return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
   };
 
   React.useEffect(() => {
