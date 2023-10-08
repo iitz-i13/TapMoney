@@ -1,14 +1,20 @@
 import React from 'react';
 import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 const ResultPage = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+
+  // CategorizePageから渡された情報を取得
+  const { timestamp, category, amount } = route.params;
 
   return (
     <View style={styles.container}>
       
-      {/* この部分はそのままで、他のコンテンツを追加することも可能。 */}
+      <Text>タイムスタンプ: {timestamp}</Text>
+      <Text>カテゴリー: {category}</Text>
+      <Text>料金: {amount}</Text>
       
       <View style={styles.footer}>
         <TouchableOpacity
