@@ -6,7 +6,6 @@ import {
   useColorScheme,
 } from 'react-native';
 
-<<<<<<< HEAD
 import {
   Colors,
   DebugInstructions,
@@ -14,11 +13,6 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-=======
-import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
->>>>>>> resultpage
 import InputPage from './components/InputPage';
 import CategorizePage from './components/CategorizePage';
 import ResultPage from './components/ResultPage';
