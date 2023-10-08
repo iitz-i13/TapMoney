@@ -1,5 +1,5 @@
-import React from 'react';
-import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+import React, { useState } from 'react';
+import {StyleSheet, View, Text, TouchableOpacity, FlatList} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 
 const ResultPage = () => {
@@ -7,15 +7,47 @@ const ResultPage = () => {
   const route = useRoute();
 
   // CategorizePageから渡された情報を取得
-  const { timestamp, category, amount } = route.params;
+  const timestamp = route.params?.timestamp;
+  const category = route.params?.category;
+  const amount = route.params?.amount;
+
+  // タイムスタンプを月・日形式で表示するヘルパー関数
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+    return `${date.getFullYear()}.{date.getMonth() + 1}.${date.getDate()}`;
+  };
+
+  React.useEffect(() => {
+    if (timestamp && category && amount) {
+      const newRecord = {
+        id: timestamp,
+        timestamp: formatTimestamp(timestamp),
+        category: category,
+        amount: amount,
+      };
+      setRecords(prevRecords => [newRecord, ...prevRecords]);
+    }
+  }, [timestamp, category, amount]);
 
   return (
     <View style={styles.container}>
-      
-      <Text>タイムスタンプ: {timestamp}</Text>
-      <Text>カテゴリー: {category}</Text>
-      <Text>料金: {amount}</Text>
-      
+      <View style={styles.balanceContainer}>
+        <Text style={styles.balanceText}>残高: ￥{amount}</Text> 
+      </View>
+
+      {/* 記録のリストを表示 */}
+      <FlatList
+        data={records}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.recordRow}>
+            <Text>{item.timestamp}</Text>
+            <Text>{item.category}</Text>
+            <Text>{item.amount}</Text>
+          </View>
+        )}
+      />
+
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.button}
@@ -31,7 +63,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  
+  balanceContainer: {
     justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1.0,
+  },
+  
+  balanceText: {
+    fontSize: 24,
+    marginBottom: 20,
   },
 
   button: {
@@ -45,6 +87,15 @@ const styles = StyleSheet.create({
 
   buttonText: {
     fontSize: 18,
+  },
+
+  recordRow: {
+    flexDirection: 'row',  // 横並びにする
+    justifyContent: 'space-between', // 各項目を均等に配置
+    padding: 10,
+    width: '100%',
+    borderBottomWidth: 1,
+    borderBottomColor: 'lightgray',
   },
 
   footer: {
