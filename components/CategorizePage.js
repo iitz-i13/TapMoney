@@ -8,9 +8,33 @@ const CategorizePage = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button, styles.expenseButton]}
         onPress={() => navigation.navigate('残高確認画面')}>
-        <Text>Go to Result Page</Text>
+        <Text>食費</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, styles.expenseButton]}
+        onPress={() => navigation.navigate('残高確認画面')}>
+        <Text>交通費</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, styles.expenseButton]}
+        onPress={() => navigation.navigate('残高確認画面')}>
+        <Text>趣味</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, styles.expenseButton]}
+        onPress={() => navigation.navigate('残高確認画面')}>
+        <Text>その他</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, styles.incomeButton]}
+        onPress={() => navigation.navigate('残高確認画面')}>
+        <Text>収入</Text>
       </TouchableOpacity>
     </View>
   );
@@ -26,8 +50,15 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 20,
     padding: 10,
-    backgroundColor: 'lightgray',
     borderRadius: 5,
+    width: 150,
+    alignItems: 'center',
+  },
+  expenseButton: {
+    backgroundColor: '#FFDDDD', // 薄い赤色
+  },
+  incomeButton: {
+    backgroundColor: '#DDFFDD', // 薄い緑色
   },
 });
 
