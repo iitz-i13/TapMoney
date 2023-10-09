@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {StyleSheet, View, Text, TouchableOpacity, FlatList} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuid from 'react-native-uuid';
 
 const ResultPage = () => {
   const navigation = useNavigation();
@@ -17,6 +18,25 @@ const ResultPage = () => {
   const formatTimestamp = timestamp => {
     const date = new Date(timestamp);
     return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity style={styles.resetButton} onPress={resetData}>
+          <Text>Reset</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
+  const resetData = async () => {
+    try {
+      await AsyncStorage.removeItem('records');  // データを初期化
+      setRecords([]);  // ステートも初期化
+    } catch (error) {
+      console.error('Failed to reset data:', error);
+    }
   };
 
   React.useEffect(() => {
@@ -38,8 +58,10 @@ const ResultPage = () => {
   React.useEffect(() => {
     const addNewRecord = async () => {
       if (timestamp && category && amount) {
+        const newId = uuid.v4();
+
         const newRecord = {
-          id: timestamp,
+          id: newId,
           timestamp: formatTimestamp(timestamp),
           category: category,
           amount: amount,
@@ -72,10 +94,15 @@ const ResultPage = () => {
     addNewRecord();
   }, [timestamp, category, amount]);
 
+  const calculateBalance = () => {
+    return records.reduce((acc, record) => acc + parseFloat(record.amount), 0);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.balanceText}>残高: ￥{amount}</Text>
+        {/* ここで残高を計算して表示します */}
+        <Text style={styles.balanceText}>残高: ￥{calculateBalance()}</Text>
       </View>
 
       {/* 記録のリストを表示 */}
@@ -142,15 +169,6 @@ const styles = StyleSheet.create({
     width: '100%',
     borderBottomWidth: 1,
     borderBottomColor: 'lightgray',
-  },
-
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: 'lightgray',
   },
 
   listContent: {
