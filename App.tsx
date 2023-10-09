@@ -28,10 +28,10 @@ function App(): JSX.Element {
         backgroundColor={backgroundStyle.backgroundColor}
       />
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="金額入力画面">
-          <Stack.Screen name="金額入力画面" component={InputPage} />
-          <Stack.Screen name="属性選択画面" component={CategorizePage} />
-          <Stack.Screen name="残高確認画面" component={ResultPage} />
+        <Stack.Navigator initialRouteName="金額入力">
+          <Stack.Screen name="金額入力" component={InputPage} />
+          <Stack.Screen name="属性選択" component={CategorizePage} />
+          <Stack.Screen name="残高確認" component={ResultPage} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>
