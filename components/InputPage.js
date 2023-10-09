@@ -69,14 +69,14 @@ const InputPage = () => {
       </View>
       <TouchableOpacity
         style={styles.centerButton}  // 修正したスタイル名
-        onPress={() => navigation.navigate('属性選択画面', { amount: '1000' })}> 
+        onPress={() => navigation.navigate('属性選択', { amount: '1000' })}> 
         <Text>Go to Categorize Page</Text>
       </TouchableOpacity>
 
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.footerButton}  // 修正したスタイル名
-          onPress={() => navigation.navigate('残高確認画面')}>
+          onPress={() => navigation.navigate('残高確認')}>
           <Text style={styles.buttonText}>Go to Result Page</Text>
         </TouchableOpacity>
       </View>
