@@ -142,7 +142,7 @@ const ResultPage = () => {
             >
               <Text>{item.timestamp}</Text>
               <Text>{item.category}</Text>
-              <Text>{item.amount}</Text>
+              <Text>{item.amount} 円</Text>
             </View>
           </Swipeable>
         )}
