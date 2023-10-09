@@ -3,6 +3,8 @@ import {StyleSheet, View, Text, TouchableOpacity, FlatList} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
+import { Swipeable } from 'react-native-gesture-handler';
+
 
 const ResultPage = () => {
   const navigation = useNavigation();
@@ -98,6 +100,20 @@ const ResultPage = () => {
     return records.reduce((acc, record) => acc + parseFloat(record.amount), 0);
   };
 
+  const renderRightActions = (progress, dragX, item) => {
+    const handleDelete = async () => {
+      const updatedRecords = records.filter(record => record.id !== item.id);
+      setRecords(updatedRecords);
+      await AsyncStorage.setItem('records', JSON.stringify(updatedRecords));
+    };
+  
+    return (
+      <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
+        <Text style={styles.deleteText}>Delete</Text>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -105,30 +121,32 @@ const ResultPage = () => {
         <Text style={styles.headerText}>残高： {calculateBalance()}円</Text>
       </View>
     
-    <View style={styles.recordHeader}>
-      <Text style={styles.headerItem}>月日</Text>
-      <Text style={styles.headerItem}>カテゴリー</Text>
-      <Text style={styles.headerItem}>金額</Text>
-    </View>
+      <View style={styles.recordHeader}>
+        <Text style={styles.headerItem}>月日</Text>
+        <Text style={styles.headerItem}>カテゴリー</Text>
+        <Text style={styles.headerItem}>金額</Text>
+      </View>
 
       {/* 記録のリストを表示 */}
       <FlatList
-    contentContainerStyle={styles.listContent}
-    data={records}
-    keyExtractor={item => item.id}
-    renderItem={({item}) => (
-      <View 
-        style={[
-          item.amount > 0 ? styles.incomeBackground : styles.expenseBackground, 
-          styles.recordRow,
-        ]}
-      >
-        <Text>{item.timestamp}</Text>
-        <Text>{item.category}</Text>
-        <Text>{item.amount}</Text>
-      </View>
-    )}
-  />
+        contentContainerStyle={styles.listContent}
+        data={records}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <Swipeable renderRightActions={(progress, dragX) => renderRightActions(progress, dragX, item)}>
+            <View 
+              style={[
+                item.amount > 0 ? styles.incomeBackground : styles.expenseBackground,
+                styles.recordRow
+              ]}
+            >
+              <Text>{item.timestamp}</Text>
+              <Text>{item.category}</Text>
+              <Text>{item.amount}</Text>
+            </View>
+          </Swipeable>
+        )}
+      />
 
       <View style={styles.footer}>
         <TouchableOpacity
@@ -144,7 +162,7 @@ const ResultPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'lightgrey',
   },
 
   header: {
@@ -164,7 +182,7 @@ const styles = StyleSheet.create({
   button: {
     width: '100%',
     padding: 20,
-    backgroundColor: 'lightgray',
+    backgroundColor: '#CCFFCC',
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
@@ -179,6 +197,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 10,
     backgroundColor: 'white',
+    borderColor: 'white',
   },
 
   headerItem: {
@@ -207,6 +226,20 @@ const styles = StyleSheet.create({
     paddingBottom: 60, // footerの高さに合わせて調整
   },
 
+  deleteButton: {
+    backgroundColor: 'red',
+    borderColor: 'red', // 枠の色を赤にする
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 70,
+    height: '100%',
+  },
+
+  deleteText: {
+    color: 'white',
+  }, 
+
   footer: {
     position: 'absolute',
     bottom: 0,
@@ -214,7 +247,7 @@ const styles = StyleSheet.create({
     height: 60, // footerの高さを確定的にする
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: 'lightgray',
+    borderTopColor: 'white',
     backgroundColor: '#fff', // footerの背景を白に
   },
 });
