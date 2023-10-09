@@ -102,27 +102,38 @@ const ResultPage = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         {/* ここで残高を計算して表示します */}
-        <Text style={styles.balanceText}>残高: ￥{calculateBalance()}</Text>
+        <Text style={styles.headerText}>残高： {calculateBalance()}円</Text>
       </View>
+    
+    <View style={styles.recordHeader}>
+      <Text style={styles.headerItem}>月日</Text>
+      <Text style={styles.headerItem}>カテゴリー</Text>
+      <Text style={styles.headerItem}>金額</Text>
+    </View>
 
       {/* 記録のリストを表示 */}
       <FlatList
-        contentContainerStyle={styles.listContent} // ここにスタイルを適用する
-        data={records}
-        keyExtractor={item => item.id}
-        renderItem={({item}) => (
-          <View style={styles.recordRow}>
-            <Text>{item.timestamp}</Text>
-            <Text>{item.category}</Text>
-            <Text>{item.amount}</Text>
-          </View>
-        )}
-      />
+    contentContainerStyle={styles.listContent}
+    data={records}
+    keyExtractor={item => item.id}
+    renderItem={({item}) => (
+      <View 
+        style={[
+          item.amount > 0 ? styles.incomeBackground : styles.expenseBackground, 
+          styles.recordRow,
+        ]}
+      >
+        <Text>{item.timestamp}</Text>
+        <Text>{item.category}</Text>
+        <Text>{item.amount}</Text>
+      </View>
+    )}
+  />
 
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('金額入力画面')}>
+          onPress={() => navigation.navigate('金額入力')}>
           <Text style={styles.buttonText}>Go to Input Page</Text>
         </TouchableOpacity>
       </View>
@@ -137,16 +148,17 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 60, // ヘッダーの高さを設定
-    borderBottomWidth: 1, // 下の境界線
-    borderBottomColor: 'lightgray',
+    justifyContent: 'center',  // 垂直方向（縦）に中央に配置
+    alignItems: 'center',      // 水平方向（横）に中央に配置
+    height: 70,               // ヘッダーの高さを設定
+    borderBottomWidth: 1,     // 下の境界線
+    borderColor: '#33CC66',
+    backgroundColor: '#33CC66', 
   },
 
-  balanceText: {
+  headerText: {
     fontSize: 24,
-    marginBottom: 20,
+    color: 'white'
   },
 
   button: {
@@ -162,6 +174,26 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 
+  recordHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    backgroundColor: 'white',
+  },
+
+  headerItem: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
+  incomeBackground: {
+    backgroundColor: 'lightgreen',
+  },
+
+  expenseBackground: {
+    backgroundColor: '#FFB6C1',
+  },
+
   recordRow: {
     flexDirection: 'row', // 横並びにする
     justifyContent: 'space-between', // 各項目を均等に配置
@@ -172,7 +204,6 @@ const styles = StyleSheet.create({
   },
 
   listContent: {
-    // ここに新しいスタイルを追加
     paddingBottom: 60, // footerの高さに合わせて調整
   },
 
