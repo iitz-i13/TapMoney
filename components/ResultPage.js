@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, Text, TouchableOpacity, FlatList} from 'react-native';
+import {StyleSheet, View, Text, TouchableOpacity, FlatList, Alert} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
@@ -33,12 +33,29 @@ const ResultPage = () => {
   }, [navigation]);
 
   const resetData = async () => {
-    try {
-      await AsyncStorage.removeItem('records');  // データを初期化
-      setRecords([]);  // ステートも初期化
-    } catch (error) {
-      console.error('Failed to reset data:', error);
-    }
+    // アラートの表示
+    Alert.alert(
+      'データリセット',  // タイトル
+      '全データを初期化してもよろしいですか？\n データを復元することはできません',  // メッセージ
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        },
+        {
+          text: 'OK',
+          onPress: async () => {  // OKを選択した場合の処理
+            try {
+              await AsyncStorage.removeItem('records');  // データを初期化
+              setRecords([]);  // ステートも初期化
+            } catch (error) {
+              console.error('Failed to reset data:', error);
+            }
+          }
+        }
+      ],
+      {cancelable: false}
+    );
   };
 
   React.useEffect(() => {
@@ -117,12 +134,12 @@ const ResultPage = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        {/* ここで残高を計算して表示します */}
+        {/* ここで残高を計算して表示 */}
         <Text style={styles.headerText}>残高： {calculateBalance()}円</Text>
       </View>
     
       <View style={styles.recordHeader}>
-        <Text style={styles.headerItem}>月日</Text>
+        <Text style={styles.headerItem}>日付</Text>
         <Text style={styles.headerItem}>カテゴリー</Text>
         <Text style={styles.headerItem}>金額</Text>
       </View>
