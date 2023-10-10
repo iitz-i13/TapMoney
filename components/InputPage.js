@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 
@@ -38,6 +38,18 @@ const InputPage = () => {
       } else {
         newInput = input + value;
       }
+    }
+
+    if (parseInt(newInput.replace(/,/g, "")) >= 1000000) {
+      // 1,000,000を超える場合は、Alert ダイアログを表示
+      Alert.alert(
+        "入力エラー", // タイトル
+        "100万以上は入力できません。", // メッセージ
+        [
+          { text: "OK", onPress: () => { } } // ボタン
+        ]
+      );
+      return;
     }
 
     setInput(formatNumberWithCommas(newInput.replace(/,/g, "")));
@@ -92,8 +104,22 @@ const InputPage = () => {
       </View>
 
       <TouchableOpacity
-        style={styles.centerButton}  // 修正したスタイル名
-        onPress={() => navigation.navigate('属性選択', { amount: input })}>
+        style={styles.centerButton}
+        onPress={() => {
+          // 入力が「0」または「00」の場合、Alertを表示して処理を終了
+          if (input === "0" || input === "00") {
+            Alert.alert(
+              "入力エラー", // タイトル
+              "0または00は無効な入力です。", // メッセージ
+              [
+                { text: "OK", onPress: () => { } } // ボタン
+              ]
+            );
+            return;
+          }
+          // 通常の画面遷移処理
+          navigation.navigate('属性選択', { amount: input });
+        }}>
         <Text>属性選択へ</Text>
       </TouchableOpacity>
 
@@ -130,10 +156,14 @@ const styles = StyleSheet.create({
 
   centerButton: {
     marginTop: 20,
-    padding: 10,
+    paddingVertical: 15,  // 縦方向のパディングを増やす
+    paddingHorizontal: 40,  // 横方向のパディングを増やす
     backgroundColor: 'lightgray',
     borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
+
 
   footerButton: {  // 新しいスタイル名
     width: '100%',
@@ -153,11 +183,15 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    width: '33.33%',  // 3つのボタンが1行に並ぶように33.33%に設定
+    // width: '33.33%',  // 3つのボタンが1行に並ぶように33.33%に設定
+    width: 80,  // この値は適切に調整してください
+    height: 80, // この値は適切に調整してください
     padding: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 15,  // ボタン間のスペースを追加
+    marginBottom: 10,  // ボタン間のスペースを追加
+    borderRadius: 42.5,  // widthまたはheightの半分の値
+    backgroundColor: '#f5f5f5',  // 背景色を追加（オプション）
   },
 
   buttonText: {
