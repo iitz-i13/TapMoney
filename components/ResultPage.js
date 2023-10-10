@@ -149,6 +149,39 @@ const ResultPage = () => {
         contentContainerStyle={styles.listContent}
         data={records}
         keyExtractor={item => item.id}
+        renderItem={({item}) => (
+          <Swipeable renderRightActions={(progress, dragX) => renderRightActions(progress, dragX, item)}>
+            <TouchableOpacity
+              onPress={async () => {
+                let storedRecords = JSON.parse(
+                  await AsyncStorage.getItem('records'),
+                );
+                const recordWithMemo = storedRecords.find(
+                  record => record.id === item.id,
+                );
+                openMemoPage(recordWithMemo);
+              }}>
+              <View
+                style={[
+                  item.amount > 0
+                    ? styles.incomeBackground
+                    : styles.expenseBackground,
+                  styles.recordRow,
+                ]}>
+                <View style={styles.leftGroup}>
+                  <Text style={styles.dateText}>{item.timestamp}</Text>
+                  <Text>{item.category}</Text>
+                  <Text style={styles.smallMemo}>
+                    {item.memo
+                      ? item.memo.length > 10
+                        ? item.memo.slice(0, 10) + '...'
+                        : item.memo
+                      : ' '}
+                  </Text>
+                </View>
+                <Text>{item.amount} 円</Text>
+              </View>
+            </TouchableOpacity>
         renderItem={({ item }) => (
           <Swipeable renderRightActions={(progress, dragX) => renderRightActions(progress, dragX, item)}>
             <View 
