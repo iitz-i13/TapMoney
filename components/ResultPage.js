@@ -7,7 +7,11 @@ import {
   FlatList,
   Alert,
 } from 'react-native';
-import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
+import {
+  useNavigation,
+  useRoute,
+  useFocusEffect,
+} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
 import {Swipeable} from 'react-native-gesture-handler';
@@ -81,9 +85,9 @@ const ResultPage = () => {
           console.error('Failed to fetch records:', error);
         }
       };
-  
+
       fetchRecords();
-    }, [])
+    }, []),
   );
 
   React.useEffect(() => {
@@ -121,7 +125,6 @@ const ResultPage = () => {
         }
       }
     };
-
     addNewRecord();
   }, [timestamp, category, amount]);
 
@@ -129,7 +132,7 @@ const ResultPage = () => {
     return records.reduce((acc, record) => acc + parseFloat(record.amount), 0);
   };
 
-  const renderRightActions = (item) => {
+  const renderRightActions = item => {
     const handleDelete = async () => {
       const updatedRecords = records.filter(record => record.id !== item.id);
       setRecords(updatedRecords);
@@ -162,10 +165,7 @@ const ResultPage = () => {
         data={records}
         keyExtractor={item => item.id}
         renderItem={({item}) => (
-          <Swipeable
-            renderRightActions={(progress, dragX) =>
-              renderRightActions(progress, dragX, item)
-            }>
+          <Swipeable renderRightActions={() => renderRightActions(item)}>
             <TouchableOpacity
               onPress={async () => {
                 let storedRecords = JSON.parse(
