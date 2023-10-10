@@ -11,7 +11,7 @@ const CategorizePage = () => {
 
   const handleCategoryPress = category => {
     const timestamp = new Date().toISOString();
-    navigation.navigate('残高確認画面', {
+    navigation.navigate('残高確認', {
       timestamp: timestamp,
       category: category,
       amount: receivedAmount,
