@@ -154,7 +154,7 @@ const ResultPage = () => {
       </View>
 
       <View style={styles.recordHeader}>
-        <Text style={styles.headerItem}>日付</Text>
+        <Text style={styles.headerDateItem}>日付</Text>
         <Text style={styles.headerItem}>カテゴリー</Text>
         <Text style={styles.headerItem}>金額</Text>
       </View>
@@ -184,8 +184,12 @@ const ResultPage = () => {
                   styles.recordRow,
                 ]}>
                 <View style={styles.leftGroup}>
-                  <Text style={styles.dateText}>{item.timestamp}</Text>
-                  <Text>{item.category}</Text>
+                  <View style={styles.dateAndCategory}>
+                    <Text style={styles.dateText}>{item.timestamp}</Text>
+                    <View style={styles.categoryContainer}>
+                      <Text style={styles.categoryText}>{item.category}</Text>
+                    </View>
+                  </View>
                   <Text style={styles.smallMemo}>
                     {item.memo
                       ? item.memo.length > 10
@@ -232,6 +236,11 @@ const styles = StyleSheet.create({
     color: 'white',
   },
 
+  dateAndCategory: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
   button: {
     width: '100%',
     padding: 20,
@@ -256,11 +265,18 @@ const styles = StyleSheet.create({
   headerItem: {
     fontSize: 16,
     fontWeight: 'bold',
+    marginRight: 20, // この値は適切に調整してください
+  },
+
+  headerDateItem: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 20, // この値は適切に調整してください
   },
 
   dateText: {
     marginLeft: 5,
-    marginRight: 70, //日付とカテゴリーの間の空白
+    marginRight: 40, //日付とカテゴリーの間の空白
   },
 
   incomeBackground: {
@@ -285,6 +301,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1, // これにより金額の部分のスペースを取らないようにします
+  },
+
+  categoryContainer: {
+    width: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  categoryText: {
+    textAlign: 'center',
   },
 
   smallMemo: {
