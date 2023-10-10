@@ -109,13 +109,13 @@ const ResultPage = () => {
         }
       }
     };
-
     addNewRecord();
   }, [timestamp, category, amount]);
 
   const calculateBalance = () => {
     return records.reduce((acc, record) => acc + parseFloat(record.amount), 0);
   };
+
 
   const renderRightActions = (progress, dragX, item) => {
     const handleDelete = async () => {
