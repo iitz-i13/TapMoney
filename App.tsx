@@ -12,6 +12,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import InputPage from './components/InputPage';
 import CategorizePage from './components/CategorizePage';
 import ResultPage from './components/ResultPage';
+
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const Stack = createNativeStackNavigator();

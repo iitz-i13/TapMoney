@@ -57,7 +57,6 @@ const InputPage = () => {
     setInput(String(result));
     setPreviousInput("");
     setOperation(null);
-
     // →ボタンを押したときに属性選択画面に遷移する処理を追加
     navigation.navigate('属性選択', { amount: input });
   };
@@ -144,6 +143,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  
   buttons: {
     flexDirection: 'row',
     flexWrap: 'wrap',

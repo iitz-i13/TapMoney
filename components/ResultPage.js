@@ -5,7 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
 import { Swipeable } from 'react-native-gesture-handler';
 
-
 const ResultPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -35,6 +34,7 @@ const ResultPage = () => {
   const resetData = async () => {
     // アラートの表示
     Alert.alert(
+
       'データリセット',  // タイトル
       '全データを初期化してもよろしいですか？\n データを復元することはできません',  // メッセージ
       [
@@ -123,7 +123,7 @@ const ResultPage = () => {
       setRecords(updatedRecords);
       await AsyncStorage.setItem('records', JSON.stringify(updatedRecords));
     };
-  
+
     return (
       <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
         <Text style={styles.deleteText}>Delete</Text>
@@ -137,7 +137,7 @@ const ResultPage = () => {
         {/* ここで残高を計算して表示 */}
         <Text style={styles.headerText}>残高： {calculateBalance()}円</Text>
       </View>
-    
+
       <View style={styles.recordHeader}>
         <Text style={styles.headerItem}>日付</Text>
         <Text style={styles.headerItem}>カテゴリー</Text>
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'lightgray',
   },
-
+  
   listContent: {
     paddingBottom: 60, // footerの高さに合わせて調整
   },
@@ -256,6 +256,7 @@ const styles = StyleSheet.create({
   deleteText: {
     color: 'white',
   }, 
+
 
   footer: {
     position: 'absolute',
