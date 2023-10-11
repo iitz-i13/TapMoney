@@ -125,6 +125,7 @@ const ResultPage = () => {
         }
       }
     };
+
     addNewRecord();
   }, [timestamp, category, amount]);
 
@@ -132,7 +133,7 @@ const ResultPage = () => {
     return records.reduce((acc, record) => acc + parseFloat(record.amount), 0);
   };
 
-  const renderRightActions = item => {
+  const renderRightActions = (progress, dragX, item) => {
     const handleDelete = async () => {
       const updatedRecords = records.filter(record => record.id !== item.id);
       setRecords(updatedRecords);

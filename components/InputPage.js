@@ -164,6 +164,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+
   footerButton: {  // 新しいスタイル名
     width: '100%',
     padding: 20,
