@@ -118,7 +118,7 @@ const InputPage = () => {
           // 通常の画面遷移処理
           navigation.navigate('属性選択', { amount: input });
         }}>
-        <Text>属性選択へ</Text>
+        <Text style={styles.buttonText}>属性選択へ</Text>
       </TouchableOpacity>
 
       <View style={styles.footer}>
@@ -140,12 +140,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   display: {
-    width: '100%',  // 画面の幅いっぱいに表示
-    height: 50,     // 高さを固定
+    position: 'absolute', // 位置を絶対値に設定
+    top: 10, // 画面の最上部に配置
+    width: '100%', // 画面の幅いっぱいに表示
     justifyContent: 'center',
     alignItems: 'center',
-    // borderBottomWidth: 1,  // 下に境界線を追加（オプション）
-    borderBottomColor: 'lightgray',  // 境界線の色（オプション）
+    borderBottomColor: 'lightgray', // 境界線の色（オプション）
+    padding: 10, // 必要に応じてパディングを追加して、テキストが端にくっつかないようにする
+    backgroundColor: '#fff', // 背景色を設定（オプション）
   },
 
   displayText: {
@@ -155,7 +157,7 @@ const styles = StyleSheet.create({
   centerButton: {
     marginTop: 20,
     paddingVertical: 15,  // 縦方向のパディングを増やす
-    paddingHorizontal: 40,  // 横方向のパディングを増やす
+    paddingHorizontal: 60,  // 横方向のパディングを増やす
     backgroundColor: 'lightgray',
     borderRadius: 5,
     justifyContent: 'center',
@@ -177,14 +179,14 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     width: '80%',  // この値は適切に調整してください
-    marginTop: 20,
+    marginTop: -10,
   },
 
   button: {
     // width: '33.33%',  // 3つのボタンが1行に並ぶように33.33%に設定
     width: 80,  // この値は適切に調整してください
     height: 80, // この値は適切に調整してください
-    padding: 10,
+    padding: 5,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,  // ボタン間のスペースを追加
