@@ -230,6 +230,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 36,
   },
+
   button: {
     marginTop: 20,
     padding: 10,
@@ -237,6 +238,7 @@ const styles = StyleSheet.create({
     width: 150,
     alignItems: 'center',
   },
+
   addbutton: {
     marginTop: 20,
     padding: 10,
