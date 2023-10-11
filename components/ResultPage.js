@@ -202,7 +202,7 @@ const ResultPage = () => {
                       : ' '}
                   </Text>
                 </View>
-                <Text style={styles.amountText}>{item.amount} 円</Text>
+                <Text style={styles.amountText}>{formatNumberWithCommas(item.amount)} 円</Text>
               </View>
             </TouchableOpacity>
           </Swipeable>
