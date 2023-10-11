@@ -13,6 +13,7 @@ import InputPage from './components/InputPage';
 import CategorizePage from './components/CategorizePage';
 import ResultPage from './components/ResultPage';
 
+import MemoPage from './components/MemoPage';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const Stack = createNativeStackNavigator();
@@ -35,11 +36,11 @@ function App(): JSX.Element {
             <Stack.Screen name="金額入力" component={InputPage} />
             <Stack.Screen name="属性選択" component={CategorizePage} />
             <Stack.Screen name="残高確認" component={ResultPage} />
+            <Stack.Screen name="メモ" component={MemoPage} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>
     </GestureHandlerRootView>
-    
   );
 }
 

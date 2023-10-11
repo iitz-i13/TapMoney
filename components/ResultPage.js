@@ -1,9 +1,20 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, Text, TouchableOpacity, FlatList, Alert} from 'react-native';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+} from 'react-native';
+import {
+  useNavigation,
+  useRoute,
+  useFocusEffect,
+} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
-import { Swipeable } from 'react-native-gesture-handler';
+import {Swipeable} from 'react-native-gesture-handler';
 
 const ResultPage = () => {
   const navigation = useNavigation();
@@ -14,6 +25,10 @@ const ResultPage = () => {
   const timestamp = route.params?.timestamp;
   const category = route.params?.category;
   const amount = route.params?.amount;
+
+  const openMemoPage = item => {
+    navigation.navigate('メモ', {item: item, memo: item.memo});
+  };
 
   // タイムスタンプを月・日形式で表示するヘルパー関数
   const formatTimestamp = timestamp => {
@@ -34,45 +49,46 @@ const ResultPage = () => {
   const resetData = async () => {
     // アラートの表示
     Alert.alert(
-
-      'データリセット',  // タイトル
-      '全データを初期化してもよろしいですか？\n データを復元することはできません',  // メッセージ
+      'データリセット', // タイトル
+      '全てのデータを削除します\n データを復元することはできません\n 本当に初期化しますか？', // メッセージ
       [
         {
           text: 'Cancel',
-          style: 'cancel'
+          style: 'cancel',
         },
         {
           text: 'OK',
-          onPress: async () => {  // OKを選択した場合の処理
+          onPress: async () => {
+            // OKを選択した場合の処理
             try {
-              await AsyncStorage.removeItem('records');  // データを初期化
-              setRecords([]);  // ステートも初期化
+              await AsyncStorage.removeItem('records'); // データを初期化
+              setRecords([]); // ステートも初期化
             } catch (error) {
               console.error('Failed to reset data:', error);
             }
-          }
-        }
+          },
+        },
       ],
-      {cancelable: false}
+      {cancelable: false},
     );
   };
 
-  React.useEffect(() => {
-    // AsyncStorageから記録を読み出す
-    const fetchRecords = async () => {
-      try {
-        const storedRecords = await AsyncStorage.getItem('records');
-        if (storedRecords !== null) {
-          setRecords(JSON.parse(storedRecords));
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchRecords = async () => {
+        try {
+          const storedRecords = await AsyncStorage.getItem('records');
+          if (storedRecords !== null) {
+            setRecords(JSON.parse(storedRecords));
+          }
+        } catch (error) {
+          console.error('Failed to fetch records:', error);
         }
-      } catch (error) {
-        console.error('Failed to fetch records:', error);
-      }
-    };
+      };
 
-    fetchRecords();
-  }, []);
+      fetchRecords();
+    }, []),
+  );
 
   React.useEffect(() => {
     const addNewRecord = async () => {
@@ -139,7 +155,7 @@ const ResultPage = () => {
       </View>
 
       <View style={styles.recordHeader}>
-        <Text style={styles.headerItem}>日付</Text>
+        <Text style={styles.headerDateItem}>日付</Text>
         <Text style={styles.headerItem}>カテゴリー</Text>
         <Text style={styles.headerItem}>金額</Text>
       </View>
@@ -149,18 +165,43 @@ const ResultPage = () => {
         contentContainerStyle={styles.listContent}
         data={records}
         keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <Swipeable renderRightActions={(progress, dragX) => renderRightActions(progress, dragX, item)}>
-            <View 
-              style={[
-                item.amount > 0 ? styles.incomeBackground : styles.expenseBackground,
-                styles.recordRow
-              ]}
-            >
-              <Text>{item.timestamp}</Text>
-              <Text>{item.category}</Text>
-              <Text>{item.amount} 円</Text>
-            </View>
+        renderItem={({item}) => (
+          <Swipeable renderRightActions={() => renderRightActions(item)}>
+            <TouchableOpacity
+              onPress={async () => {
+                let storedRecords = JSON.parse(
+                  await AsyncStorage.getItem('records'),
+                );
+                const recordWithMemo = storedRecords.find(
+                  record => record.id === item.id,
+                );
+                openMemoPage(recordWithMemo);
+              }}>
+              <View
+                style={[
+                  item.amount > 0
+                    ? styles.incomeBackground
+                    : styles.expenseBackground,
+                  styles.recordRow,
+                ]}>
+                <View style={styles.leftGroup}>
+                  <View style={styles.dateAndCategory}>
+                    <Text style={styles.dateText}>{item.timestamp}</Text>
+                    <View style={styles.categoryContainer}>
+                      <Text style={styles.categoryText}>{item.category}</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.smallMemo}>
+                    {item.memo
+                      ? item.memo.length > 10
+                        ? item.memo.slice(0, 10) + '...'
+                        : item.memo
+                      : ' '}
+                  </Text>
+                </View>
+                <Text>{item.amount} 円</Text>
+              </View>
+            </TouchableOpacity>
           </Swipeable>
         )}
       />
@@ -169,7 +210,7 @@ const ResultPage = () => {
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate('金額入力')}>
-          <Text style={styles.buttonText}>Go to Input Page</Text>
+          <Text style={styles.buttonText}>金額入力へ</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -183,17 +224,22 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    justifyContent: 'center',  // 垂直方向（縦）に中央に配置
-    alignItems: 'center',      // 水平方向（横）に中央に配置
-    height: 70,               // ヘッダーの高さを設定
-    borderBottomWidth: 1,     // 下の境界線
+    justifyContent: 'center', // 垂直方向（縦）に中央に配置
+    alignItems: 'center', // 水平方向（横）に中央に配置
+    height: 70, // ヘッダーの高さを設定
+    borderBottomWidth: 1, // 下の境界線
     borderColor: '#33CC66',
-    backgroundColor: '#33CC66', 
+    backgroundColor: '#33CC66',
   },
 
   headerText: {
     fontSize: 24,
-    color: 'white'
+    color: 'white',
+  },
+
+  dateAndCategory: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
   button: {
@@ -206,7 +252,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    fontSize: 18,
+    fontSize: 28,
   },
 
   recordHeader: {
@@ -220,6 +266,18 @@ const styles = StyleSheet.create({
   headerItem: {
     fontSize: 16,
     fontWeight: 'bold',
+    marginRight: 20, // この値は適切に調整してください
+  },
+
+  headerDateItem: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 20, // この値は適切に調整してください
+  },
+
+  dateText: {
+    marginLeft: 5,
+    marginRight: 40, //日付とカテゴリーの間の空白
   },
 
   incomeBackground: {
@@ -231,14 +289,37 @@ const styles = StyleSheet.create({
   },
 
   recordRow: {
-    flexDirection: 'row', // 横並びにする
-    justifyContent: 'space-between', // 各項目を均等に配置
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 10,
     width: '100%',
     borderBottomWidth: 1,
     borderBottomColor: 'lightgray',
   },
-  
+
+  leftGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1, // これにより金額の部分のスペースを取らないようにします
+  },
+
+  categoryContainer: {
+    width: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  categoryText: {
+    textAlign: 'center',
+  },
+
+  smallMemo: {
+    fontSize: 12,
+    color: 'gray', // 好みの色に調整することができます
+    marginLeft: 10,
+  },
+
   listContent: {
     paddingBottom: 60, // footerの高さに合わせて調整
   },
@@ -255,18 +336,15 @@ const styles = StyleSheet.create({
 
   deleteText: {
     color: 'white',
-  }, 
-
+  },
 
   footer: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60, // footerの高さを確定的にする
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: 'white',
-    backgroundColor: '#fff', // footerの背景を白に
+    borderTopColor: 'lightgray',
   },
 });
 
