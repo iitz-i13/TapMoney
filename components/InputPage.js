@@ -5,8 +5,8 @@ import { useState } from 'react';
 
 const InputPage = () => {
   const navigation = useNavigation();
-  const [input, setInput] = useState("");
-  const [previousInput, setPreviousInput] = useState("");
+  const [input, setInput] = useState("0");
+  const [previousInput, setPreviousInput] = useState("0");
   const [operation, setOperation] = useState(null);
   const formatNumberWithCommas = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -15,7 +15,7 @@ const InputPage = () => {
   useEffect(() => {
     // focus イベントのリスナーを追加
     const unsubscribe = navigation.addListener('focus', () => {
-      setInput(""); // input を初期化
+      setInput("0"); // input を初期化
     });
 
     // クリーンアップ関数を返すことで、イベントリスナーを削除します。
@@ -24,7 +24,6 @@ const InputPage = () => {
 
   const handlePress = (value) => {
     let newInput;
-
     if (value === "00") {
       // input が 0 だけで構成されている場合は 00 を追加しない
       if (/^0+$/.test(input)) {
@@ -39,7 +38,6 @@ const InputPage = () => {
         newInput = input + value;
       }
     }
-
     if (parseInt(newInput.replace(/,/g, "")) >= 1000000) {
       // 1,000,000を超える場合は、Alert ダイアログを表示
       Alert.alert(
@@ -74,8 +72,8 @@ const InputPage = () => {
   };
 
   const handleClear = () => {
-    setInput("");
-    setPreviousInput("");
+    setInput("0");
+    setPreviousInput("0");
     setOperation(null);
   };
 
@@ -110,7 +108,7 @@ const InputPage = () => {
           if (input === "0" || input === "00") {
             Alert.alert(
               "入力エラー", // タイトル
-              "0または00は無効な入力です。", // メッセージ
+              "0は無効な入力です。", // メッセージ
               [
                 { text: "OK", onPress: () => { } } // ボタン
               ]
@@ -120,7 +118,7 @@ const InputPage = () => {
           // 通常の画面遷移処理
           navigation.navigate('属性選択', { amount: input });
         }}>
-        <Text>属性選択へ</Text>
+        <Text style={styles.buttonText}>属性選択へ</Text>
       </TouchableOpacity>
 
       <View style={styles.footer}>
@@ -142,12 +140,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   display: {
-    width: '100%',  // 画面の幅いっぱいに表示
-    height: 50,     // 高さを固定
+    position: 'absolute', // 位置を絶対値に設定
+    top: 10, // 画面の最上部に配置
+    width: '100%', // 画面の幅いっぱいに表示
     justifyContent: 'center',
     alignItems: 'center',
-    // borderBottomWidth: 1,  // 下に境界線を追加（オプション）
-    borderBottomColor: 'lightgray',  // 境界線の色（オプション）
+    borderBottomColor: 'lightgray', // 境界線の色（オプション）
+    padding: 10, // 必要に応じてパディングを追加して、テキストが端にくっつかないようにする
+    backgroundColor: '#fff', // 背景色を設定（オプション）
   },
 
   displayText: {
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   centerButton: {
     marginTop: 20,
     paddingVertical: 15,  // 縦方向のパディングを増やす
-    paddingHorizontal: 40,  // 横方向のパディングを増やす
+    paddingHorizontal: 60,  // 横方向のパディングを増やす
     backgroundColor: 'lightgray',
     borderRadius: 5,
     justifyContent: 'center',
@@ -172,20 +172,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
+
   buttons: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     width: '80%',  // この値は適切に調整してください
-    marginTop: 20,
+    marginTop: -10,
   },
 
   button: {
     // width: '33.33%',  // 3つのボタンが1行に並ぶように33.33%に設定
     width: 80,  // この値は適切に調整してください
     height: 80, // この値は適切に調整してください
-    padding: 10,
+    padding: 5,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,  // ボタン間のスペースを追加
