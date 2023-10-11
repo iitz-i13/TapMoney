@@ -30,6 +30,10 @@ const ResultPage = () => {
     navigation.navigate('メモ', {item: item, memo: item.memo});
   };
 
+  const formatNumberWithCommas = (number) => {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
   // タイムスタンプを月・日形式で表示するヘルパー関数
   const formatTimestamp = timestamp => {
     const date = new Date(timestamp);
@@ -129,7 +133,7 @@ const ResultPage = () => {
   }, [timestamp, category, amount]);
 
   const calculateBalance = () => {
-    return records.reduce((acc, record) => acc + parseFloat(record.amount), 0);
+    return formatNumberWithCommas(records.reduce((acc, record) => acc + parseFloat(record.amount), 0));
   };
 
   const renderRightActions = item => {
