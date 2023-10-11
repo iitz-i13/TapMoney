@@ -1,64 +1,65 @@
-import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 
 const InputPage = () => {
   const navigation = useNavigation();
-  const [input, setInput] = useState("");
-  const [previousInput, setPreviousInput] = useState("");
-  const [operation, setOperation] = useState(null);
+  const [input, setInput] = useState(0);  // 数値として初期化
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setInput(0); // input を初期化
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
   const formatNumberWithCommas = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
   const handlePress = (value) => {
-    let newInput = input + value;
+    let newInput = input;
 
-    if (input === "0" && value !== "0") {
-      setInput(formatNumberWithCommas(value));
-    } else if (input !== "0" || (input === "0" && value !== "0")) {
-      setInput(formatNumberWithCommas(newInput.replace(/,/g, "")));
+    if (value === "00") {
+      if (input === 0) {
+        return;
+      }
+      newInput = input * 100;
+    } else {
+      if (input === 0) {
+        newInput = parseInt(value, 10);
+      } else {
+        newInput = input * 10 + parseInt(value, 10);
+      }
     }
-  };
 
-  const handleOperation = (op) => {
-    if (!input) return;
-    setPreviousInput(input);
-    setInput("");
-    setOperation(op);
-  };
+    if (newInput >= 1000000) {
+      Alert.alert("入力エラー", "100万以上は入力できません。", [{ text: "OK" }]);
+      return;
+    }
 
-  const handleEqual = () => {
-    if (!previousInput || !input) return;
-
-    let result;
-    setInput(String(result));
-    setPreviousInput("");
-    setOperation(null);
+    setInput(newInput);
   };
 
   const handleClear = () => {
-    setInput("");
-    setPreviousInput("");
-    setOperation(null);
+    setInput(0);
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.display}>
-        <Text style={styles.displayText}>{input}</Text>
+        <Text style={styles.displayText}>{formatNumberWithCommas(input)}</Text> 
       </View>
       <View style={styles.buttons}>
-        {['7', '8', '9', '4', '5', '6', '1', '2', '3', 'C', '0', '→'].map((button, index) => (
+        {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', '00'].map((button, index) => (
           <TouchableOpacity
             key={index}
             style={styles.button}
             onPress={() => {
               if (button === 'C') {
                 handleClear();
-              } else if (button === '→') {
-                handleEqual();
               } else {
                 handlePress(button);
               }
@@ -67,17 +68,32 @@ const InputPage = () => {
           </TouchableOpacity>
         ))}
       </View>
+
       <TouchableOpacity
-        style={styles.centerButton}  // 修正したスタイル名
-        onPress={() => navigation.navigate('属性選択', { amount: '1000' })}> 
-        <Text>Go to Categorize Page</Text>
+        style={styles.centerButton}
+        onPress={() => {
+          // 入力が「0」または「00」の場合、Alertを表示して処理を終了
+          if (input === "0" || input === "00") {
+            Alert.alert(
+              "入力エラー", // タイトル
+              "0は無効な入力です。", // メッセージ
+              [
+                { text: "OK", onPress: () => { } } // ボタン
+              ]
+            );
+            return;
+          }
+          // 通常の画面遷移処理
+          navigation.navigate('属性選択', { amount: input });
+        }}>
+        <Text style={styles.buttonText}>属性選択へ</Text>
       </TouchableOpacity>
 
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.footerButton}  // 修正したスタイル名
           onPress={() => navigation.navigate('残高確認')}>
-          <Text style={styles.buttonText}>Go to Result Page</Text>
+          <Text style={styles.buttonText}>残高確認へ</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -91,13 +107,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  display: {
+    position: 'absolute', // 位置を絶対値に設定
+    top: 10, // 画面の最上部に配置
+    width: '100%', // 画面の幅いっぱいに表示
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderBottomColor: 'lightgray', // 境界線の色（オプション）
+    padding: 10, // 必要に応じてパディングを追加して、テキストが端にくっつかないようにする
+    backgroundColor: '#fff', // 背景色を設定（オプション）
+  },
+
+  displayText: {
+    fontSize: 36,
+  },
 
   centerButton: {
     marginTop: 20,
-    padding: 10,
+    paddingVertical: 15,  // 縦方向のパディングを増やす
+    paddingHorizontal: 60,  // 横方向のパディングを増やす
     backgroundColor: 'lightgray',
     borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
+
 
   footerButton: {  // 新しいスタイル名
     width: '100%',
@@ -108,8 +142,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+  buttons: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    width: '80%',  // この値は適切に調整してください
+    marginTop: -10,
+  },
+
+  button: {
+    // width: '33.33%',  // 3つのボタンが1行に並ぶように33.33%に設定
+    width: 80,  // この値は適切に調整してください
+    height: 80, // この値は適切に調整してください
+    padding: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,  // ボタン間のスペースを追加
+    borderRadius: 42.5,  // widthまたはheightの半分の値
+    backgroundColor: '#f5f5f5',  // 背景色を追加（オプション）
+  },
+
   buttonText: {
-    fontSize: 18,
+    fontSize: 28,
   },
 
   footer: {
