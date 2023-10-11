@@ -86,7 +86,7 @@ const CategorizePage = () => {
       finalAmount = (-1 * parseFloat(receivedAmount)).toString();
     }
 
-    navigation.navigate('残高確認画面', {
+    navigation.navigate('残高確認', {
       timestamp: timestamp,
       category: category,
       amount: finalAmount,
