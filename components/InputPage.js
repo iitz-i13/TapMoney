@@ -5,8 +5,8 @@ import { useState } from 'react';
 
 const InputPage = () => {
   const navigation = useNavigation();
-  const [input, setInput] = useState("");
-  const [previousInput, setPreviousInput] = useState("");
+  const [input, setInput] = useState("0");
+  const [previousInput, setPreviousInput] = useState("0");
   const [operation, setOperation] = useState(null);
   const formatNumberWithCommas = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -15,7 +15,7 @@ const InputPage = () => {
   useEffect(() => {
     // focus イベントのリスナーを追加
     const unsubscribe = navigation.addListener('focus', () => {
-      setInput(""); // input を初期化
+      setInput("0"); // input を初期化
     });
 
     // クリーンアップ関数を返すことで、イベントリスナーを削除します。
@@ -24,7 +24,6 @@ const InputPage = () => {
 
   const handlePress = (value) => {
     let newInput;
-
     if (value === "00") {
       // input が 0 だけで構成されている場合は 00 を追加しない
       if (/^0+$/.test(input)) {
@@ -39,7 +38,6 @@ const InputPage = () => {
         newInput = input + value;
       }
     }
-
     if (parseInt(newInput.replace(/,/g, "")) >= 1000000) {
       // 1,000,000を超える場合は、Alert ダイアログを表示
       Alert.alert(
@@ -74,8 +72,8 @@ const InputPage = () => {
   };
 
   const handleClear = () => {
-    setInput("");
-    setPreviousInput("");
+    setInput("0");
+    setPreviousInput("0");
     setOperation(null);
   };
 
@@ -173,7 +171,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
+
   buttons: {
     flexDirection: 'row',
     flexWrap: 'wrap',
