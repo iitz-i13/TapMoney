@@ -31,24 +31,24 @@ const MemoPage = ({route, navigation}) => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
-      <ScrollView>
-        <TextInput
-          autoFocus={true}
-          style={styles.textInput}
-          placeholder="メモを入力"
-          value={memo}
-          onChangeText={setMemo}
-          maxLength={100}
-          multiline={true}
-          onSubmitEditing={saveMemo}
-          returnKeyType="done"
-        />
-        <Button title="Save" onPress={saveMemo} />
-      </ScrollView>
-    </KeyboardAvoidingView>
+    style={styles.container}
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
+    <ScrollView>
+      <TextInput
+        autoFocus={true}
+        style={styles.textInput}
+        placeholder="メモを入力"
+        value={memo}
+        onChangeText={setMemo}
+        maxLength={100}
+        // multiline={true} // これを削除
+        onSubmitEditing={saveMemo} // これが"done"キーまたは"return"キーが押されたときに実行される
+        returnKeyType="done"
+      />
+      <Button title="保存" onPress={saveMemo} />
+    </ScrollView>
+  </KeyboardAvoidingView>
   );
 };
 
