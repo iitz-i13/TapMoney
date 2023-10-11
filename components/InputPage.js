@@ -73,7 +73,7 @@ const InputPage = () => {
         style={styles.centerButton}
         onPress={() => {
           // 入力が「0」または「00」の場合、Alertを表示して処理を終了
-          if (input === "0" || input === "00") {
+          if (input === 0) {
             Alert.alert(
               "入力エラー", // タイトル
               "0は無効な入力です。", // メッセージ
