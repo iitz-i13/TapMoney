@@ -209,7 +209,7 @@ const ResultPage = () => {
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate('金額入力')}>
-          <Text style={styles.buttonText}>Go to Input Page</Text>
+          <Text style={styles.buttonText}>金額入力へ</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    fontSize: 18,
+    fontSize: 28,
   },
 
   recordHeader: {
@@ -341,11 +341,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: 'white',
-    backgroundColor: '#fff',
+    borderTopColor: 'lightgray',
   },
 });
 
