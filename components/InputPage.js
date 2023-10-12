@@ -36,7 +36,7 @@ const InputPage = () => {
     }
 
     if (newInput >= 1000000) {
-      Alert.alert("入力エラー", "100万以上は入力できません。", [{ text: "OK" }]);
+      Alert.alert("入力エラー", "100万以上は入力できません。", [{ text: "はい" }]);
       return;
     }
 
@@ -78,7 +78,7 @@ const InputPage = () => {
               "入力エラー", // タイトル
               "0は無効な入力です。", // メッセージ
               [
-                { text: "OK", onPress: () => { } } // ボタン
+                { text: "はい", onPress: () => { } } // ボタン
               ]
             );
             return;
