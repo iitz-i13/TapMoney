@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   Button,
   ScrollView,
+  Alert,
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // <-- 追加
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CategorizePage = () => {
   const navigation = useNavigation();
@@ -17,58 +18,135 @@ const CategorizePage = () => {
 
   const [buttonText, setButtonText] = useState('');
   const [showInput, setShowInput] = useState(false);
-  const [incomeButtons, setIncomeButtons] = useState(['収入']);
-  const [expenseButtons, setExpenseButtons] = useState([
-    '食費',
-    '交通費',
-    '趣味',
+  const [items, setItems] = useState([
+    {type: 'income', label: '収入'},
+    {type: 'expense', label: '食費'},
+    {type: 'expense', label: '交通費'},
+    {type: 'expense', label: '趣味'},
   ]);
 
-  // ボタン追加の関数
-  const addIncomeButton = async () => {
-    if (buttonText) {
-      const newButtons = [...incomeButtons, buttonText];
-      setIncomeButtons(newButtons);
-      await AsyncStorage.setItem('incomeButtons', JSON.stringify(newButtons));
-      setButtonText('');
-    }
+  const resetButtons = async () => {
+    setItems([
+      {type: 'income', label: '収入'},
+      {type: 'expense', label: '食費'},
+      {type: 'expense', label: '交通費'},
+      {type: 'expense', label: '趣味'},
+    ]);
+    await AsyncStorage.removeItem('items');
   };
 
-  const addExpenseButton = async () => {
-    if (buttonText) {
-      const newButtons = [...expenseButtons, buttonText];
-      setExpenseButtons(newButtons);
-      await AsyncStorage.setItem('expenseButtons', JSON.stringify(newButtons));
-      setButtonText('');
+  // 属性項目の最大数を定義
+  const MAX_ITEMS = 10;
+
+  //属性項目追加
+  const addItem = async type => {
+    if (!buttonText.trim()) {
+      // trimを使って空白のみの場合も考慮
+      Alert.alert(
+        'エラー',
+        '新しい項目名を入力してください。',
+        [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+        {cancelable: false},
+      );
+      return;
     }
+    // 既存の同じタイプの項目と新しい項目名が一致するかをチェック
+    const duplicateItem = items.find(
+      item => item.type === type && item.label === buttonText.trim(),
+    );
+    if (duplicateItem) {
+      Alert.alert(
+        'エラー',
+        `すでに「${buttonText}」という名前の${
+          type === 'income' ? '収入' : '支出'
+        }項目が存在します。`,
+        [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+        {cancelable: false},
+      );
+      return;
+    }
+
+    // 属性項目の最大数を超えて追加しようとした場合の制限とアラート
+    if (items.length >= MAX_ITEMS) {
+      Alert.alert(
+        'エラー',
+        `属性項目は${MAX_ITEMS}個までしか追加できません。`,
+        [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+        {cancelable: false},
+      );
+      return;
+    }
+
+    const newItem = {type: type, label: buttonText};
+    const newItems = [newItem, ...items];
+    setItems(newItems);
+    await AsyncStorage.setItem('items', JSON.stringify(newItems));
+    setButtonText('');
   };
 
+  //項目の順番変更
+  const moveItem = (index, direction) => {
+    if (
+      (index === 0 && direction === 'up') ||
+      (index === items.length - 1 && direction === 'down')
+    ) {
+      return;
+    }
+
+    const newItems = [...items];
+    const itemToMove = newItems[index];
+
+    if (direction === 'up') {
+      newItems[index] = newItems[index - 1];
+      newItems[index - 1] = itemToMove;
+    } else if (direction === 'down') {
+      newItems[index] = newItems[index + 1];
+      newItems[index + 1] = itemToMove;
+    }
+
+    setItems(newItems);
+  };
+
+  //ヘッダーの編集ボタン
   useEffect(() => {
-    const fetchButtons = async () => {
-      const storedIncomeButtons = await AsyncStorage.getItem('incomeButtons');
-      const storedExpenseButtons = await AsyncStorage.getItem('expenseButtons');
-      if (storedIncomeButtons) {
-        setIncomeButtons(JSON.parse(storedIncomeButtons));
-      }
-      if (storedExpenseButtons) {
-        setExpenseButtons(JSON.parse(storedExpenseButtons));
-      }
-    };
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={{flexDirection: 'row', paddingRight: 10}}>
+          {showInput ? (
+            <React.Fragment>
+              <Button title="完了" onPress={toggleInputForm} />
+            </React.Fragment>
+          ) : (
+            <Button title="編集" onPress={toggleInputForm} />
+          )}
+        </View>
+      ),
+    });
+  }, [showInput, navigation]);
 
-    fetchButtons();
-  }, []);
-
-  const deleteIncomeButton = async index => {
-    const newButtons = [...incomeButtons];
-    newButtons.splice(index, 1);
-    setIncomeButtons(newButtons);
-    await AsyncStorage.setItem('incomeButtons', JSON.stringify(newButtons));
-  };
-  const deleteExpenseButton = async index => {
-    const newButtons = [...expenseButtons];
-    newButtons.splice(index, 1);
-    setExpenseButtons(newButtons);
-    await AsyncStorage.setItem('expenseButtons', JSON.stringify(newButtons));
+  const deleteItem = async index => {
+    const itemName = items[index].label; // 削除しようとしているアイテムの名前を取得
+    Alert.alert(
+      '確認', // タイトル
+      `${itemName}を削除してもよろしいですか？`, // メッセージ
+      [
+        {
+          text: 'キャンセル',
+          onPress: () => console.log('キャンセル'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            const newItems = [...items];
+            newItems.splice(index, 1);
+            setItems(newItems);
+            await AsyncStorage.setItem('items', JSON.stringify(newItems));
+          },
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   const toggleInputForm = () => {
@@ -93,9 +171,12 @@ const CategorizePage = () => {
     });
   };
 
-  const CategoryButton = ({title, onPress, style}) => {
+  const CategoryButton = ({title, onPress, style, disabled}) => {
     return (
-      <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
+      <TouchableOpacity
+        style={[styles.button, style]}
+        onPress={disabled ? null : onPress}
+        activeOpacity={disabled ? 1 : 0.2}>
         <Text style={styles.buttonText}>{title}</Text>
       </TouchableOpacity>
     );
@@ -103,11 +184,6 @@ const CategorizePage = () => {
 
   return (
     <View style={styles.container}>
-      {/* editボタン */}
-      <View style={styles.editButtonContainer}>
-        <Button title={showInput ? 'Done' : 'Edit'} onPress={toggleInputForm} />
-      </View>
-
       {showInput && (
         <View>
           {/* ボタンの追加 */}
@@ -129,7 +205,7 @@ const CategorizePage = () => {
             />
             <View style={{flexDirection: 'row'}}>
               <TouchableOpacity
-                onPress={addIncomeButton}
+                onPress={() => addItem('income')}
                 style={{
                   marginTop: 20,
                   padding: 10,
@@ -139,10 +215,10 @@ const CategorizePage = () => {
                   alignItems: 'center',
                   marginBottom: 5,
                 }}>
-                <Text style={buttonText}>収入項目として追加</Text>
+                <Text style={styles.addbuttonText}>収入項目として追加</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={addExpenseButton}
+                onPress={() => addItem('expense')}
                 style={{
                   marginTop: 20,
                   padding: 10,
@@ -152,51 +228,96 @@ const CategorizePage = () => {
                   alignItems: 'center',
                   marginBottom: 5,
                 }}>
-                <Text style={buttonText}>支出項目として追加</Text>
+                <Text style={styles.addbuttonText}>支出項目として追加</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* リセットボタン */}
+            <View style={{marginTop: 20}}>
+              <TouchableOpacity
+                onPress={() => {
+                  Alert.alert(
+                    '確認', // タイトル
+                    '属性項目を初期化しますか？', // メッセージ
+                    [
+                      {
+                        text: 'キャンセル',
+                        onPress: () => console.log('キャンセル'),
+                        style: 'cancel',
+                      },
+                      {
+                        text: 'OK',
+                        onPress: resetButtons,
+                      },
+                    ],
+                    {cancelable: false},
+                  );
+                }}
+                style={{padding: 5, backgroundColor: 'red', marginLeft: 10}}>
+                <Text style={{color: 'white'}}>属性項目を初期化</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       )}
       {/*InputPageから渡されたの金額表示*/}
-      <Text style={styles.amountText}>{receivedAmount} 円</Text>
+      {!showInput && (
+        <Text style={styles.amountText}>
+          {receivedAmount.toLocaleString('ja-JP')} 円
+        </Text>
+      )}
 
-      <ScrollView style={styles.scrollView}>
-        {/* 収入ボタンリストの描画 */}
-        {incomeButtons.map((buttonText, index) => (
+      <ScrollView
+        style={[styles.scrollView, !showInput && styles.scrollViewFullWidth]}>
+        {items.map((item, index) => (
           <View
-            key={`income-${index}`}
-            style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
+            key={`${item.type}-${index}`}
+            style={[
+              {flexDirection: 'row', alignItems: 'center', marginTop: 10},
+              !showInput && styles.itemCentered,
+            ]}>
             <CategoryButton
-              title={buttonText}
-              onPress={() => handleCategoryPress(buttonText)}
-              style={styles.incomeButton}
+              title={item.label}
+              onPress={() =>
+                handleCategoryPress(item.label, item.type === 'expense')
+              }
+              style={
+                item.type === 'income'
+                  ? styles.incomeButton
+                  : styles.expenseButton
+              }
+              disabled={showInput}
             />
             {showInput && (
-              <TouchableOpacity
-                onPress={() => deleteIncomeButton(index)}
-                style={{padding: 5, backgroundColor: 'red', marginLeft: 10}}>
-                <Text style={{color: 'white'}}>削除</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        ))}
-        {/* 支出ボタンリストの描画 */}
-        {expenseButtons.map((buttonText, index) => (
-          <View
-            key={`expense-${index}`}
-            style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
-            <CategoryButton
-              title={buttonText}
-              onPress={() => handleCategoryPress(buttonText, true)}
-              style={styles.expenseButton}
-            />
-            {showInput && (
-              <TouchableOpacity
-                onPress={() => deleteExpenseButton(index)}
-                style={{padding: 5, backgroundColor: 'red', marginLeft: 10}}>
-                <Text style={{color: 'white'}}>削除</Text>
-              </TouchableOpacity>
+              <>
+                {index !== 0 && (
+                  <TouchableOpacity
+                    onPress={() => moveItem(index, 'up')}
+                    style={{
+                      padding: 5,
+                      backgroundColor: 'lightblue',
+                      marginLeft: 10,
+                    }}>
+                    <Text>↑</Text>
+                  </TouchableOpacity>
+                )}
+                {index !== items.length - 1 && (
+                  <TouchableOpacity
+                    onPress={() => moveItem(index, 'down')}
+                    style={{
+                      padding: 5,
+                      backgroundColor: 'lightblue',
+                      marginLeft: 10,
+                    }}>
+                    <Text>↓</Text>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity
+                  onPress={() => deleteItem(index)}
+                  style={{padding: 5, backgroundColor: 'red', marginLeft: 10}}>
+                  <Text style={{color: 'white'}}>削除</Text>
+                </TouchableOpacity>
+              </>
             )}
           </View>
         ))}
@@ -212,8 +333,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  scrollView: {},
+  scrollViewFullWidth: {
+    width: '100%',
+  },
+  itemCentered: {
+    justifyContent: 'center',
+    width: '100%',
+  },
+
   buttonText: {
-    fontSize: 20, // ここを調整して目的のフォントサイズに設定
+    fontSize: 20, // フォントサイズ設定
+  },
+  addbuttonText: {
+    fontSize: 15, // フォントサイズ設定
   },
   editButtonContainer: {
     alignSelf: 'flex-end',
