@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, FlatList, Alert,Dimensions } from 'react-native';
 import { useNavigation, useRoute ,useFocusEffect} from '@react-navigation/native';
-import { LineChart } from 'react-native-chart-kit';
+import { LineChart, BarChart} from 'react-native-chart-kit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
 import {Swipeable} from 'react-native-gesture-handler';
@@ -44,14 +44,13 @@ const GraphPage = () => {
       // 既に金額が設定されている場合、金額を加算
       acc[key] += Math.floor(amount);
     }
-    console.log(acc);
     return acc;
   }, {});
 
   const generateMonthLabels = () => {
     const labels = [];
     for (let i = 1; i <= 12; i++) {
-      labels.push(`${i} 月`);
+      labels.push(`${i}`);
     }
     return labels;
   };
@@ -87,7 +86,7 @@ const chartHeight = height - 30; // 適切な高さを設定
 
   return (
     <View style={{ flex: 1 }}>
-       <LineChart
+       <BarChart
         data={chartData}
         width={370}
         height={chartHeight}
