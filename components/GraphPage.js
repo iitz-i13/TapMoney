@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, FlatList, Alert,Dimensions } from 'react-native';
 import { useNavigation, useRoute ,useFocusEffect} from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -39,11 +39,12 @@ const GraphPage = () => {
     const amount = record.amount;
     if (!acc[key]) {
       // その月の初めの記録なので金額を初期化
-      acc[key] = amount;
+      acc[key] = Math.floor(amount);
     } else {
       // 既に金額が設定されている場合、金額を加算
-      acc[key] += amount;
+      acc[key] += Math.floor(amount);
     }
+    console.log(acc);
     return acc;
   }, {});
 
@@ -61,7 +62,6 @@ const GraphPage = () => {
     });
   };
   
-
   const chartData = {
     labels: generateMonthLabels(),
     datasets: [
@@ -71,6 +71,11 @@ const GraphPage = () => {
       },
     ],
   };
+  const { width, height } = Dimensions.get('window');
+
+// チャートのサイズを計算
+const chartWidth = width + 10 ; // 画面幅から余白を引く
+const chartHeight = height - 30; // 適切な高さを設定
   
   const chartConfig = {
     backgroundGradientFrom: 'white',
@@ -82,46 +87,25 @@ const GraphPage = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <LineChart
+       <LineChart
         data={chartData}
-        width={390}
-        height={400}
+        width={370}
+        height={chartHeight}
         chartConfig={chartConfig}
+        margin={{
+          top: 5,
+          right: 5,
+          left: 5,
+          bottom: 5,
+        }}
      />
-     <View>
-        {Object.keys(monthlyTotals).map((timestamp) => (
-          <View key={timestamp} style={styles.monthlyTotalItem}>
-            <Text>{timestamp}</Text>
-            <Text>{monthlyTotals[timestamp]} 円</Text>
-          </View>
-        ))}
-      </View>
-      <FlatList
-        data={records}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.recordItem}>
-            <Text>Date: {item.timestamp}</Text>
-            <Text>Category: {item.category}</Text>
-            <Text>Amount: {item.amount} 円</Text>
-          </View>
-        )}
-      />
-      <FlatList
-        data={monthlyTotals}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => (
-          <View style={styles.monthlyItem}>
-            <Text>Month {index + 1} Total: {item} 円</Text>
-          </View>
-        )}
-      /> 
+     
       {/* その他のコンポーネントや要素をここに追加 */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate('金額入力')}>
-          <Text style={styles.buttonText}>Go to Input Page</Text>
+          <Text style={styles.buttonText}>金額入力画面へ</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -135,7 +119,123 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightgrey',
   },
 
-  // ... (その他のスタイル)
-});
+  header: {
+    justifyContent: 'center', // 垂直方向（縦）に中央に配置
+    alignItems: 'center', // 水平方向（横）に中央に配置
+    height: 70, // ヘッダーの高さを設定
+    borderBottomWidth: 1, // 下の境界線
+    borderColor: '#33CC66',
+    backgroundColor: '#33CC66',
+  },
 
+  headerText: {
+    fontSize: 24,
+    color: 'white',
+  },
+
+  dateAndCategory: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  button: {
+    width: '100%',
+    padding: 20,
+    backgroundColor: '#CCFFCC',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  buttonText: {
+    fontSize: 28,
+  },
+
+  recordHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    backgroundColor: 'white',
+    borderColor: 'white',
+  },
+
+  headerItem: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginRight: 20, // この値は適切に調整してください
+  },
+
+  headerDateItem: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 20, // この値は適切に調整してください
+  },
+
+  dateText: {
+    marginLeft: 5,
+    marginRight: 40, //日付とカテゴリーの間の空白
+  },
+
+  incomeBackground: {
+    backgroundColor: 'lightgreen',
+  },
+
+  expenseBackground: {
+    backgroundColor: '#FFB6C1',
+  },
+
+  recordRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+    width: '100%',
+    borderBottomWidth: 1,
+    borderBottomColor: 'lightgray',
+  },
+
+  leftGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1, // これにより金額の部分のスペースを取らないようにします
+  },
+
+  categoryContainer: {
+    width: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  categoryText: {
+    textAlign: 'center',
+  },
+
+
+  listContent: {
+    paddingBottom: 60, // footerの高さに合わせて調整
+  },
+
+  deleteButton: {
+    backgroundColor: 'red',
+    borderColor: 'red', // 枠の色を赤にする
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 70,
+    height: '100%',
+  },
+
+  deleteText: {
+    color: 'white',
+  },
+
+  footer: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: 'lightgray',
+  },
+});
 export default GraphPage;
