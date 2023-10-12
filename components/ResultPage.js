@@ -43,12 +43,23 @@ const ResultPage = () => {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity style={styles.resetButton} onPress={resetData}>
-          <Text>初期化</Text>
-        </TouchableOpacity>
+        <View style={styles.headerRow}>
+          <TouchableOpacity style={styles.resetButton} onPress={showGraphPage}>
+            <Text>グラフ表示</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.resetButton} onPress={resetData}>
+            <Text>初期化</Text>
+          </TouchableOpacity>
+        </View>
+        
       ),
     });
   }, [navigation]);
+
+  const showGraphPage = () => {
+    navigation.navigate('グラフ表示');
+  };
 
   const resetData = async () => {
     // アラートの表示
@@ -218,11 +229,6 @@ const ResultPage = () => {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('グラフ表示')}>
-          <Text style={styles.buttonText}>グラフ表示へ</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
           onPress={() => navigation.navigate('金額入力')}>
           <Text style={styles.buttonText}>金額入力へ</Text>
         </TouchableOpacity>
@@ -235,6 +241,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'lightgrey',
+  },
+
+  headerRow: {
+    flexDirection: 'row',
+  }, 
+
+  resetButton: {
+    marginLeft: 10, 
   },
 
   header: {
