@@ -30,6 +30,10 @@ const ResultPage = () => {
     navigation.navigate('メモ', {item: item, memo: item.memo});
   };
 
+  const formatNumberWithCommas = (number) => {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
   // タイムスタンプを月・日形式で表示するヘルパー関数
   const formatTimestamp = timestamp => {
     const date = new Date(timestamp);
@@ -40,7 +44,7 @@ const ResultPage = () => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity style={styles.resetButton} onPress={resetData}>
-          <Text>Reset</Text>
+          <Text>初期化</Text>
         </TouchableOpacity>
       ),
     });
@@ -125,14 +129,15 @@ const ResultPage = () => {
         }
       }
     };
+
     addNewRecord();
   }, [timestamp, category, amount]);
 
   const calculateBalance = () => {
-    return records.reduce((acc, record) => acc + parseFloat(record.amount), 0);
+    return formatNumberWithCommas(records.reduce((acc, record) => acc + parseFloat(record.amount), 0));
   };
 
-  const renderRightActions = item => {
+  const renderRightActions = (progress, dragX, item) => {
     const handleDelete = async () => {
       const updatedRecords = records.filter(record => record.id !== item.id);
       setRecords(updatedRecords);
@@ -141,7 +146,7 @@ const ResultPage = () => {
 
     return (
       <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
-        <Text style={styles.deleteText}>Delete</Text>
+        <Text style={styles.deleteText}>削除</Text>
       </TouchableOpacity>
     );
   };
@@ -198,7 +203,7 @@ const ResultPage = () => {
                       : ' '}
                   </Text>
                 </View>
-                <Text>{item.amount} 円</Text>
+                <Text style={styles.amountText}>{formatNumberWithCommas(item.amount)} 円</Text>
               </View>
             </TouchableOpacity>
           </Swipeable>
@@ -227,13 +232,14 @@ const styles = StyleSheet.create({
     alignItems: 'center', // 水平方向（横）に中央に配置
     height: 70, // ヘッダーの高さを設定
     borderBottomWidth: 1, // 下の境界線
-    borderColor: '#33CC66',
-    backgroundColor: '#33CC66',
+    borderColor: '#00FF99',
+    backgroundColor: '#00FF99',
   },
 
   headerText: {
     fontSize: 24,
-    color: 'white',
+    fontWeight: 'bold',
+    color: 'black',
   },
 
   dateAndCategory: {
@@ -244,7 +250,7 @@ const styles = StyleSheet.create({
   button: {
     width: '100%',
     padding: 20,
-    backgroundColor: '#CCFFCC',
+    backgroundColor: '#FF773E',
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
@@ -252,6 +258,8 @@ const styles = StyleSheet.create({
 
   buttonText: {
     fontSize: 28,
+    fontWeight: 'bold',
+    color: 'black',
   },
 
   recordHeader: {
@@ -279,6 +287,16 @@ const styles = StyleSheet.create({
     marginRight: 40, //日付とカテゴリーの間の空白
   },
 
+  categoryText: {
+    textAlign: 'center',
+    fontSize: 15,
+  },
+
+  amountText: {
+    textAlign: 'center',
+    fontSize: 15,
+  },
+
   incomeBackground: {
     backgroundColor: 'lightgreen',
   },
@@ -291,7 +309,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 10,
+    padding: 12,
     width: '100%',
     borderBottomWidth: 1,
     borderBottomColor: 'lightgray',
@@ -309,14 +327,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  categoryText: {
-    textAlign: 'center',
-  },
-
   smallMemo: {
     fontSize: 12,
     color: 'gray', // 好みの色に調整することができます
-    marginLeft: 10,
+    marginLeft: -15,
   },
 
   listContent: {
@@ -335,6 +349,8 @@ const styles = StyleSheet.create({
 
   deleteText: {
     color: 'white',
+    fontWeight: 'bold',
+    fontSize: 15,
   },
 
   footer: {
@@ -343,7 +359,8 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: 'lightgray',
+    borderTopColor: 'white',
+    backgroundColor: '#fff',
   },
 });
 

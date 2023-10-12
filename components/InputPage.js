@@ -5,82 +5,52 @@ import { useState } from 'react';
 
 const InputPage = () => {
   const navigation = useNavigation();
-  const [input, setInput] = useState("0");
-  const [previousInput, setPreviousInput] = useState("0");
-  const [operation, setOperation] = useState(null);
+  const [input, setInput] = useState(0);  // 数値として初期化
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setInput(0); // input を初期化
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
   const formatNumberWithCommas = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
-  useEffect(() => {
-    // focus イベントのリスナーを追加
-    const unsubscribe = navigation.addListener('focus', () => {
-      setInput("0"); // input を初期化
-    });
-
-    // クリーンアップ関数を返すことで、イベントリスナーを削除します。
-    return unsubscribe;
-  }, [navigation]);
-
   const handlePress = (value) => {
-    let newInput;
+    let newInput = input;
+
     if (value === "00") {
-      // input が 0 だけで構成されている場合は 00 を追加しない
-      if (/^0+$/.test(input)) {
+      if (input === 0) {
         return;
       }
-      newInput = input + "00";
+      newInput = input * 100;
     } else {
-      // input が 0 だけで構成されている場合は新しい入力の数字に置き換える
-      if (/^0+$/.test(input)) {
-        newInput = value;
+      if (input === 0) {
+        newInput = parseInt(value, 10);
       } else {
-        newInput = input + value;
+        newInput = input * 10 + parseInt(value, 10);
       }
     }
-    if (parseInt(newInput.replace(/,/g, "")) >= 1000000) {
-      // 1,000,000を超える場合は、Alert ダイアログを表示
-      Alert.alert(
-        "入力エラー", // タイトル
-        "100万以上は入力できません。", // メッセージ
-        [
-          { text: "OK", onPress: () => { } } // ボタン
-        ]
-      );
+
+    if (newInput >= 1000000) {
+      Alert.alert("入力エラー", "100万以上は入力できません。", [{ text: "OK" }]);
       return;
     }
 
-    setInput(formatNumberWithCommas(newInput.replace(/,/g, "")));
-  };
-
-  const handleOperation = (op) => {
-    if (!input) return;
-    setPreviousInput(input);
-    setInput("");
-    setOperation(op);
-  };
-
-  const handleEqual = () => {
-    if (!previousInput || !input) return;
-
-    let result;
-    setInput(String(result));
-    setPreviousInput("");
-    setOperation(null);
-    // →ボタンを押したときに属性選択画面に遷移する処理を追加
-    navigation.navigate('属性選択', { amount: input });
+    setInput(newInput);
   };
 
   const handleClear = () => {
-    setInput("0");
-    setPreviousInput("0");
-    setOperation(null);
+    setInput(0);
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.display}>
-        <Text style={styles.displayText}>{input}</Text>
+        <Text style={styles.displayText}>{formatNumberWithCommas(input)}</Text> 
       </View>
       <View style={styles.buttons}>
         {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', '00'].map((button, index) => (
@@ -90,8 +60,6 @@ const InputPage = () => {
             onPress={() => {
               if (button === 'C') {
                 handleClear();
-              } else if (button === '→') {
-                handleEqual();
               } else {
                 handlePress(button);
               }
@@ -105,7 +73,7 @@ const InputPage = () => {
         style={styles.centerButton}
         onPress={() => {
           // 入力が「0」または「00」の場合、Alertを表示して処理を終了
-          if (input === "0" || input === "00") {
+          if (input === 0) {
             Alert.alert(
               "入力エラー", // タイトル
               "0は無効な入力です。", // メッセージ
@@ -164,6 +132,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+
   footerButton: {  // 新しいスタイル名
     width: '100%',
     padding: 20,
@@ -208,4 +177,3 @@ const styles = StyleSheet.create({
 });
 
 export default InputPage;
-
