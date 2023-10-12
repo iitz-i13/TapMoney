@@ -218,6 +218,11 @@ const ResultPage = () => {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.button}
+          onPress={() => navigation.navigate('グラフ表示')}>
+          <Text style={styles.buttonText}>グラフ表示へ</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
           onPress={() => navigation.navigate('金額入力')}>
           <Text style={styles.buttonText}>金額入力へ</Text>
         </TouchableOpacity>
