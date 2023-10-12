@@ -30,8 +30,8 @@ const ResultPage = () => {
     navigation.navigate('メモ', {item: item, memo: item.memo});
   };
 
-  const formatNumberWithCommas = (number) => {
-    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const formatNumberWithCommas = number => {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
   // タイムスタンプを月・日形式で表示するヘルパー関数
@@ -101,7 +101,7 @@ const ResultPage = () => {
 
         const newRecord = {
           id: newId,
-          timestamp: formatTimestamp(timestamp),
+          timestamp: timestamp,
           category: category,
           amount: amount,
         };
@@ -133,7 +133,9 @@ const ResultPage = () => {
   }, [timestamp, category, amount]);
 
   const calculateBalance = () => {
-    return formatNumberWithCommas(records.reduce((acc, record) => acc + parseFloat(record.amount), 0));
+    return formatNumberWithCommas(
+      records.reduce((acc, record) => acc + parseFloat(record.amount), 0),
+    );
   };
 
   const renderRightActions = item => {
@@ -189,7 +191,9 @@ const ResultPage = () => {
                 ]}>
                 <View style={styles.leftGroup}>
                   <View style={styles.dateAndCategory}>
-                    <Text style={styles.dateText}>{item.timestamp}</Text>
+                    <Text style={styles.dateText}>
+                      {formatTimestamp(timestamp)}
+                    </Text>
                     <View style={styles.categoryContainer}>
                       <Text style={styles.categoryText}>{item.category}</Text>
                     </View>
@@ -202,7 +206,9 @@ const ResultPage = () => {
                       : ' '}
                   </Text>
                 </View>
-                <Text style={styles.amountText}>{formatNumberWithCommas(item.amount)} 円</Text>
+                <Text style={styles.amountText}>
+                  {formatNumberWithCommas(item.amount)} 円
+                </Text>
               </View>
             </TouchableOpacity>
           </Swipeable>
