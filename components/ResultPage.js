@@ -57,7 +57,7 @@ const ResultPage = () => {
       '全てのデータを削除します\n データを復元することはできません\n 本当に初期化しますか？', // メッセージ
       [
         {
-          text: 'Cancel',
+          text: 'キャンセル',
           style: 'cancel',
         },
         {
