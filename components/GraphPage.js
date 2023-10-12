@@ -1,92 +1,52 @@
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, Text, TouchableOpacity, FlatList, Alert} from 'react-native';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { useNavigation, useRoute ,useFocusEffect} from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
-import { Swipeable } from 'react-native-gesture-handler';
+import {Swipeable} from 'react-native-gesture-handler';
 
 const GraphPage = () => {
-  const [monthlyData, setMonthlyData] = useState(Array(12).fill(0)); // 月次データのstate
+  const [monthlyData, setMonthlyData] = useState(Array(12).fill(0)); // Monthly data state
   const navigation = useNavigation();
   const route = useRoute();
-  const [records, setRecords] = useState([]);
   const timestamp = route.params?.timestamp;
   const category = route.params?.category;
   const amount = route.params?.amount;
-  React.useEffect(() => {
-    const addNewRecord = async () => {
-      if (timestamp && category && amount) {
-        const newId = uuid.v4();
-
-        const newRecord = {
-          id: newId,
-          timestamp: formatTimestamp(timestamp),
-          category: category,
-          amount: amount,
-        };
-
-        // AsyncStorageから記録を読み出す
-        let storedRecords = [];
+  const [records, setRecords] = useState([]); 
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchRecords = async () => {
         try {
-          const result = await AsyncStorage.getItem('records');
-          if (result !== null) {
-            storedRecords = JSON.parse(result);
+          const storedRecords = await AsyncStorage.getItem('records');
+          if (storedRecords !== null) {
+            setRecords(JSON.parse(storedRecords));
           }
         } catch (error) {
           console.error('Failed to fetch records:', error);
         }
+      };
 
-        // 新しい記録を追加
-        const updatedRecords = [newRecord, ...storedRecords];
-        setRecords(updatedRecords); // ステートを更新
+      fetchRecords();
+    }, []),
+  );
 
-        // 更新された記録をAsyncStorageに保存
-        try {
-          await AsyncStorage.setItem('records', JSON.stringify(updatedRecords));
-        } catch (error) {
-          console.error('Failed to save record:', error);
-        }
-      }
-    };
+  const acc ={}
 
-    addNewRecord();
-  }, [timestamp, category, amount]);
-  const calculateMonthlyTotals = (records) => {
-    const monthlyTotals = {};
-  
-    records.forEach((record) => {
-      const date = new Date(record.timestamp);
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1; // 月は0から11で表現されているため+1
-  
-      const key = `${year}-${month}`;
-      if (!monthlyTotals[key]) {
-        monthlyTotals[key] = 0;
-      }
-  
-      monthlyTotals[key] += record.amount;
-    });
-  
-    return monthlyTotals;
-  };
-  const calculateBalance = () => {
-    return records.reduce((acc, record) => acc + parseFloat(record.amount), 0);
-  };
+  const monthlyTotals = records.reduce((acc, record) => {
+    const date = new Date(record.timestamp);
+    const key =  date.getMonth() + 1; // timestampをキーとして使用
+    const amount = record.amount;
+    if (!acc[key]) {
+      // その月の初めの記録なので金額を初期化
+      acc[key] = amount;
+    } else {
+      // 既に金額が設定されている場合、金額を加算
+      acc[key] += amount;
+    }
+    return acc;
+  }, {});
 
-  const renderRightActions = (progress, dragX, item) => {
-    const handleDelete = async () => {
-      const updatedRecords = records.filter(record => record.id !== item.id);
-      setRecords(updatedRecords);
-      await AsyncStorage.setItem('records', JSON.stringify(updatedRecords));
-    };
-
-    return (
-      <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
-        <Text style={styles.deleteText}>Delete</Text>
-      </TouchableOpacity>
-    );
-  };
   const generateMonthLabels = () => {
     const labels = [];
     for (let i = 1; i <= 12; i++) {
@@ -101,8 +61,7 @@ const GraphPage = () => {
     });
   };
   
-  const monthlyTotals = calculateMonthlyTotals(records); // calculateMonthlyTotalsは前のコードで定義
-  
+
   const chartData = {
     labels: generateMonthLabels(),
     datasets: [
@@ -128,9 +87,35 @@ const GraphPage = () => {
         width={390}
         height={400}
         chartConfig={chartConfig}
+     />
+     <View>
+        {Object.keys(monthlyTotals).map((timestamp) => (
+          <View key={timestamp} style={styles.monthlyTotalItem}>
+            <Text>{timestamp}</Text>
+            <Text>{monthlyTotals[timestamp]} 円</Text>
+          </View>
+        ))}
+      </View>
+      <FlatList
+        data={records}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.recordItem}>
+            <Text>Date: {item.timestamp}</Text>
+            <Text>Category: {item.category}</Text>
+            <Text>Amount: {item.amount} 円</Text>
+          </View>
+        )}
       />
-      {/* records の内容を表示 */}
-      <Text>Records: {JSON.stringify(records)}</Text>
+      <FlatList
+        data={monthlyTotals}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item, index }) => (
+          <View style={styles.monthlyItem}>
+            <Text>Month {index + 1} Total: {item} 円</Text>
+          </View>
+        )}
+      /> 
       {/* その他のコンポーネントや要素をここに追加 */}
       <View style={styles.footer}>
         <TouchableOpacity
