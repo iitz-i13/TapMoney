@@ -86,7 +86,7 @@ const CategorizePage = () => {
       finalAmount = (-1 * parseFloat(receivedAmount)).toString();
     }
 
-    navigation.navigate('残高確認画面', {
+    navigation.navigate('残高確認', {
       timestamp: timestamp,
       category: category,
       amount: finalAmount,
@@ -230,7 +230,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 36,
   },
-
   button: {
     marginTop: 20,
     padding: 10,
@@ -238,7 +237,6 @@ const styles = StyleSheet.create({
     width: 150,
     alignItems: 'center',
   },
-
   addbutton: {
     marginTop: 20,
     padding: 10,
