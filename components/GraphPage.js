@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, FlatList, Alert,Dimensions } from 'react-native';
 import { useNavigation, useRoute ,useFocusEffect} from '@react-navigation/native';
-import { LineChart } from 'react-native-chart-kit';
+import { LineChart, BarChart} from 'react-native-chart-kit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import uuid from 'react-native-uuid';
-import {Swipeable} from 'react-native-gesture-handler';
 
 const GraphPage = () => {
   const [monthlyData, setMonthlyData] = useState(Array(12).fill(0)); // Monthly data state
@@ -44,14 +42,13 @@ const GraphPage = () => {
       // 既に金額が設定されている場合、金額を加算
       acc[key] += Math.floor(amount);
     }
-    console.log(acc);
     return acc;
   }, {});
 
   const generateMonthLabels = () => {
     const labels = [];
     for (let i = 1; i <= 12; i++) {
-      labels.push(`${i} 月`);
+      labels.push(`${i}`);
     }
     return labels;
   };
@@ -67,21 +64,25 @@ const GraphPage = () => {
     datasets: [
       {
         data: generateDataArray(monthlyTotals),
-        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+        //color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+        //color: (opacity = 1) => 'black',
       },
     ],
   };
   const { width, height } = Dimensions.get('window');
 
 // チャートのサイズを計算
-const chartWidth = width + 10 ; // 画面幅から余白を引く
-const chartHeight = height - 30; // 適切な高さを設定
+const chartWidth = width  ; // 画面幅から余白を引く
+const chartHeight = height - 50; // 適切な高さを設定
   
   const chartConfig = {
+    //backgroundColor: 'white',
     backgroundGradientFrom: 'white',
     backgroundGradientTo: 'white',
     decimalPlaces: 0,
-    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    fillShadowGradient: 'white',
+    color: (opacity = 1) => `black`,
+    //color: (opacity = 1) => 'white',
     strokeWidth: 2,
   };
 
@@ -89,9 +90,10 @@ const chartHeight = height - 30; // 適切な高さを設定
     <View style={{ flex: 1 }}>
        <LineChart
         data={chartData}
-        width={370}
+        width={chartWidth}
         height={chartHeight}
         chartConfig={chartConfig}
+        withShadow = {false}
         margin={{
           top: 5,
           right: 5,
@@ -116,7 +118,7 @@ const chartHeight = height - 30; // 適切な高さを設定
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'lightgrey',
+    backgroundColor: 'lightgray',
   },
 
   header: {
