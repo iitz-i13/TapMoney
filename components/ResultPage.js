@@ -88,23 +88,6 @@ const ResultPage = () => {
     );
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      const fetchRecords = async () => {
-        try {
-          const storedRecords = await AsyncStorage.getItem('records');
-          if (storedRecords !== null) {
-            setRecords(JSON.parse(storedRecords));
-          }
-        } catch (error) {
-          console.error('Failed to fetch records:', error);
-        }
-      };
-
-      fetchRecords();
-    }, []),
-  );
-
   React.useEffect(() => {
     const addNewRecord = async () => {
       if (timestamp && category && amount) {
@@ -150,7 +133,7 @@ const ResultPage = () => {
     );
   };
 
-  const renderRightActions = (progress, dragX, item) => {
+  const renderRightActions = (item) => {
     const handleDelete = async () => {
       const updatedRecords = records.filter(record => record.id !== item.id);
       setRecords(updatedRecords);
@@ -283,7 +266,6 @@ const styles = StyleSheet.create({
 
   buttonText: {
     fontSize: 28,
-    fontWeight: 'bold',
     color: 'black',
   },
 
