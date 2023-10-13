@@ -45,7 +45,7 @@ const CategorizePage = () => {
       Alert.alert(
         'エラー',
         '新しい項目名を入力してください。',
-        [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+        [{text: 'はい', onPress: () => console.log('はい Pressed')}],
         {cancelable: false},
       );
       return;
@@ -60,7 +60,7 @@ const CategorizePage = () => {
         `すでに「${buttonText}」という名前の${
           type === 'income' ? '収入' : '支出'
         }項目が存在します。`,
-        [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+        [{text: 'はい', onPress: () => console.log('はい Pressed')}],
         {cancelable: false},
       );
       return;
@@ -71,7 +71,7 @@ const CategorizePage = () => {
       Alert.alert(
         'エラー',
         `属性項目は${MAX_ITEMS}個までしか追加できません。`,
-        [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+        [{text: 'はい', onPress: () => console.log('はい Pressed')}],
         {cancelable: false},
       );
       return;
@@ -136,7 +136,7 @@ const CategorizePage = () => {
           style: 'cancel',
         },
         {
-          text: 'OK',
+          text: 'はい',
           onPress: async () => {
             const newItems = [...items];
             newItems.splice(index, 1);
@@ -246,7 +246,7 @@ const CategorizePage = () => {
                         style: 'cancel',
                       },
                       {
-                        text: 'OK',
+                        text: 'はい',
                         onPress: resetButtons,
                       },
                     ],
