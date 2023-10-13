@@ -7,6 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const GraphPage = () => {
   const navigation = useNavigation();
   const [records, setRecords] = useState([]); 
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1; 
+
   useFocusEffect(
     React.useCallback(() => {
       const fetchRecords = async () => {
@@ -19,53 +22,51 @@ const GraphPage = () => {
           console.error('Failed to fetch records:', error);
         }
       };
-
       fetchRecords();
     }, []),
   );
 
   const monthlyTotals = records.reduce((acc, record) => {
     const date = new Date(record.timestamp);
-    const key =  date.getMonth() + 1; // timestampをキーとして使用
+    const monthIndex = date.getMonth() + 1;
     const amount = record.amount;
-    if (!acc[key]) {
-      // その月の初めの記録なので金額を初期化
-      acc[key] = Math.floor(amount);
-    } else {
-      // 既に金額が設定されている場合、金額を加算
-      acc[key] += Math.floor(amount);
-    }
+    acc[monthIndex] = (acc[monthIndex] || 0) + Math.floor(amount);
     return acc;
   }, {});
   
-  const generateMonthLabels = () => {
-    const labels = [];
+  const accumulateTotals = (monthlyTotals) => {
+    let accumulated = 0;
+    const accumulatedTotals = {};
     for (let i = 1; i <= 12; i++) {
-      labels.push(`${i}`);
+      accumulated += monthlyTotals[i] || 0;
+      accumulatedTotals[i] = accumulated;
+    }
+    return accumulatedTotals;
+  }
+  
+  const accumulatedData = accumulateTotals(monthlyTotals);
+  
+  const generateMonthLabels = (accumulatedData) => {
+    const labels = [];
+    for (let i = 1; i <= currentMonth; i++) { // currentMonthまでループ 今後変える必要あり
+      if (accumulatedData[i] !== undefined) {
+        labels.push(`${i}`);
+      }
     }
     return labels;
-  };
+  }; 
 
-  const generateDataArray = (monthlyTotals) => {
-    return generateMonthLabels().map((label) => {
-      const key = label.replace(' 月', '');
-      return monthlyTotals[key] || 0;
-    });
+  const generateDataArray = (accumulatedData) => {
+    const labels = generateMonthLabels(accumulatedData);
+    return labels.map((label) => accumulatedData[label]);
   };
   
   const chartData = {
-    labels: generateMonthLabels(),
+    labels: generateMonthLabels(accumulatedData),
     datasets: [
       {
-        data: generateDataArray(monthlyTotals),
-      },
-      {
-        data: Array(12).fill(0), // 12ヶ月分の0データ
-        color: (opacity = 2) => `rgba(0, 255, 255, ${opacity})`,
-        strokeWidth: 0,
-        // fillShadowGradientOpacity: 1,
-        fillShadowGradient: 'black',  // 0円の位置に黒い線
-      },
+        data: generateDataArray(accumulatedData),
+      }
     ],
   };
 
@@ -83,22 +84,21 @@ const GraphPage = () => {
 
   return (
     <View style={{ flex: 1 }}>
-       <LineChart
-          data={chartData}
-          width={chartWidth}
-          height={chartHeight}
-          chartConfig={chartConfig}
-          withShadow={false}
-          segments={5}
-          margin={{
-            top: 5,
-            right: 5,
-            left: 5,
-            bottom: 5,
-          }}
-        />
-     
-      {/* その他のコンポーネントや要素をここに追加 */}
+      <LineChart
+        data={chartData}
+        width={chartWidth}
+        height={chartHeight}
+        chartConfig={chartConfig}
+        withShadow={false}
+        segments={5}
+        margin={{
+          top: 5,
+          right: 5,
+          left: 5,
+          bottom: 5,
+        }}
+      />
+
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.button}
