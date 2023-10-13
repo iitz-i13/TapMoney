@@ -66,31 +66,36 @@ const GraphPage = () => {
     datasets: [
       {
         data: generateDataArray(monthlyTotals),
-        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+        //color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+        //color: (opacity = 1) => 'black',
       },
     ],
   };
   const { width, height } = Dimensions.get('window');
 
 // チャートのサイズを計算
-const chartWidth = width + 10 ; // 画面幅から余白を引く
-const chartHeight = height - 30; // 適切な高さを設定
+const chartWidth = width  ; // 画面幅から余白を引く
+const chartHeight = height - 50; // 適切な高さを設定
   
   const chartConfig = {
+    //backgroundColor: 'white',
     backgroundGradientFrom: 'white',
     backgroundGradientTo: 'white',
     decimalPlaces: 0,
-    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    fillShadowGradient: 'white',
+    color: (opacity = 1) => `black`,
+    //color: (opacity = 1) => 'white',
     strokeWidth: 2,
   };
 
   return (
     <View style={{ flex: 1 }}>
-       <BarChart
+       <LineChart
         data={chartData}
-        width={370}
+        width={chartWidth}
         height={chartHeight}
         chartConfig={chartConfig}
+        withShadow = {false}
         margin={{
           top: 5,
           right: 5,
@@ -115,7 +120,7 @@ const chartHeight = height - 30; // 適切な高さを設定
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'lightgrey',
+    backgroundColor: 'lightgray',
   },
 
   header: {
