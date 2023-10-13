@@ -72,7 +72,7 @@ const ResultPage = () => {
           style: 'cancel',
         },
         {
-          text: 'OK',
+          text: 'はい',
           onPress: async () => {
             // OKを選択した場合の処理
             try {
@@ -140,6 +140,7 @@ const ResultPage = () => {
         }
       }
     };
+
     addNewRecord();
   }, [timestamp, category, amount]);
 
@@ -149,7 +150,7 @@ const ResultPage = () => {
     );
   };
 
-  const renderRightActions = item => {
+  const renderRightActions = (progress, dragX, item) => {
     const handleDelete = async () => {
       const updatedRecords = records.filter(record => record.id !== item.id);
       setRecords(updatedRecords);
@@ -203,7 +204,7 @@ const ResultPage = () => {
                 <View style={styles.leftGroup}>
                   <View style={styles.dateAndCategory}>
                     <Text style={styles.dateText}>
-                      {formatTimestamp(timestamp)}
+                      {formatTimestamp(item.timestamp)}
                     </Text>
                     <View style={styles.categoryContainer}>
                       <Text style={styles.categoryText}>{item.category}</Text>
@@ -229,7 +230,7 @@ const ResultPage = () => {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('金額入力')}>
+          onPress={() => navigation.navigate('金額入力', )}>
           <Text style={styles.buttonText}>金額入力へ</Text>
         </TouchableOpacity>
       </View>
