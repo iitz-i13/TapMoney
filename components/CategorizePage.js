@@ -35,7 +35,7 @@ const CategorizePage = () => {
     await AsyncStorage.removeItem('items');
   };
 
-  // 属性項目の最大数を定義
+  // 属性項目の最大数を定義する
   const MAX_ITEMS = 10;
 
   //属性項目追加
