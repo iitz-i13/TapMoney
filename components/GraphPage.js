@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Dimensions } from 'react-native';
-import { useNavigation ,useFocusEffect} from '@react-navigation/native';
-import { LineChart, BarChart} from 'react-native-chart-kit';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { LineChart } from 'react-native-chart-kit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const GraphPage = () => {
   const navigation = useNavigation();
-  const [records, setRecords] = useState([]); 
+  const [records, setRecords] = useState([]);
   const currentDate = new Date();
-  const currentMonth = currentDate.getMonth() + 1; 
+  const currentMonth = currentDate.getMonth() + 1;
 
   useFocusEffect(
     React.useCallback(() => {
@@ -33,7 +33,7 @@ const GraphPage = () => {
     acc[monthIndex] = (acc[monthIndex] || 0) + Math.floor(amount);
     return acc;
   }, {});
-  
+
   const accumulateTotals = (monthlyTotals) => {
     let accumulated = 0;
     const accumulatedTotals = {};
@@ -42,44 +42,54 @@ const GraphPage = () => {
       accumulatedTotals[i] = accumulated;
     }
     return accumulatedTotals;
-  }
-  
+  };
+
   const accumulatedData = accumulateTotals(monthlyTotals);
-  
+
   const generateMonthLabels = (accumulatedData) => {
     const labels = [];
-    for (let i = 1; i <= currentMonth; i++) { // currentMonthまでループ 今後変える必要あり
+    for (let i = 1; i <= currentMonth; i++) {
       if (accumulatedData[i] !== undefined) {
         labels.push(`${i}`);
       }
     }
     return labels;
-  }; 
+  };
 
   const generateDataArray = (accumulatedData) => {
     const labels = generateMonthLabels(accumulatedData);
     return labels.map((label) => accumulatedData[label]);
   };
-  
+
   const chartData = {
     labels: generateMonthLabels(accumulatedData),
     datasets: [
       {
         data: generateDataArray(accumulatedData),
-      }
+      },
+      // y = 0の直線を追加
+      {
+        data: new Array(generateMonthLabels(accumulatedData).length).fill(0),
+        color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`,
+        strokeWidth: 5,
+        yLabelsSuffix: '0',
+      },
     ],
   };
 
   const { width, height } = Dimensions.get('window');
-  const chartWidth = width  ; // 画面幅から余白を引く
+  const chartWidth = width; // 画面幅から余白を引く
   const chartHeight = height - 50; // 適切な高さを設定
-  
+
   const chartConfig = {
     backgroundGradientFrom: 'white',
     backgroundGradientTo: 'white',
     decimalPlaces: 0, // 小数点 
     color: (opacity = 1) => `black`,
     strokeWidth: 3,
+    gridColor: 'black', // 格子線の色を黒に設定
+    labelColor: (opacity = 1) => `black`, // ラベルの色を黒に設定
+    yAxisLabel: '0  5000  10000  15000  20000', // カスタムラベル
   };
 
   return (
@@ -90,7 +100,7 @@ const GraphPage = () => {
         height={chartHeight}
         chartConfig={chartConfig}
         withShadow={false}
-        segments={5}
+        // yLabels={[0, 5000, 10000, 15000, 20000]}
         margin={{
           top: 5,
           right: 5,
@@ -133,4 +143,5 @@ const styles = StyleSheet.create({
     borderTopColor: 'lightgray',
   },
 });
+
 export default GraphPage;
