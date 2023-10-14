@@ -19,55 +19,7 @@ import {Swipeable} from 'react-native-gesture-handler';
 const ResultPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  
-  const testData = [
-    { id: '22', timestamp: '2023-10-14T10:00:00.000Z', category: '交通費', amount: -1500 },
-    { id: '21', timestamp: '2023-10-14T10:00:00.000Z', category: '食費', amount: -1200 },
-    { id: '20', timestamp: '2023-10-13T10:00:00.000Z', category: '食費', amount: -3400 },
-    { id: '19', timestamp: '2023-10-11T10:00:00.000Z', category: '交通費', amount: -1600 },
-    { id: '18', timestamp: '2023-10-10T10:00:00.000Z', category: '食費', amount: -2500 },
-    { id: '17', timestamp: '2023-10-08T10:00:00.000Z', category: '趣味', amount: -2000 },
-    { id: '16', timestamp: '2023-10-08T10:00:00.000Z', category: '趣味', amount: -3100 },
-    { id: '15', timestamp: '2023-10-07T10:00:00.000Z', category: '収入', amount: 10000 },
-    { id: '14', timestamp: '2023-10-06T10:00:00.000Z', category: '交通費', amount: -1200 },
-    { id: '13', timestamp: '2023-10-03T10:00:00.000Z', category: '食費', amount: -2700 },
-    { id: '12', timestamp: '2023-10-03T10:00:00.000Z', category: '趣味', amount: -4500 },
-    { id: '11', timestamp: '2023-10-03T10:00:00.000Z', category: '交通費', amount: -1500 },
-    { id: '10', timestamp: '2023-10-02T10:00:00.000Z', category: '食費', amount: -3200 },
-    { id: '09', timestamp: '2023-10-01T10:00:00.000Z', category: '収入', amount: 20000 },
-    { id: '08', timestamp: '2023-09-3T10:00:00.000Z', category: '収入', amount: 5000 },
-    { id: '07', timestamp: '2023-08-31T10:00:00.000Z', category: '収入', amount: 8000 },
-    { id: '06', timestamp: '2023-07-31T10:00:00.000Z', category: '収入', amount: -4000 },
-    { id: '05', timestamp: '2023-06-30T10:00:00.000Z', category: '収入', amount: -5000 },
-    { id: '04', timestamp: '2023-05-31T10:00:00.000Z', category: '収入', amount: 6000 },
-    { id: '03', timestamp: '2023-04-30T10:00:00.000Z', category: '収入', amount: -4000 },
-    { id: '02', timestamp: '2023-03-31T10:00:00.000Z', category: '収入', amount: 4500 },
-    { id: '01', timestamp: '2023-02-28T10:00:00.000Z', category: '収入', amount: 5356 },
-    { id: '00', timestamp: '2023-01-31T10:00:00.000Z', category: '収入', amount: 2000 }
-];
-
   const [records, setRecords] = useState([]); // 記録を保存するためのstate
-
-  const initializeTestData = async () => {
-  try {
-    // AsyncStorageから記録を取得
-    const storedRecords = await AsyncStorage.getItem('records');
-
-    // データがnull（存在しない）の場合、テストデータをAsyncStorageにセットする
-    if (storedRecords === null) {
-      await AsyncStorage.setItem('records', JSON.stringify(testData));
-      setRecords(testData);
-    } else {
-      setRecords(JSON.parse(storedRecords));
-    }
-  } catch (error) {
-    console.error('Failed to initialize test data:', error);
-  }
-};
-
-useEffect(() => {
-  initializeTestData();
-}, []);
 
   // CategorizePageから渡された情報を取得
   const timestamp = route.params?.timestamp;
@@ -96,7 +48,7 @@ useEffect(() => {
             <Text>グラフ表示</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.resetButton} onPress={resetData} >
+          <TouchableOpacity style={styles.resetButton} onPress={resetData}>
             <Text>初期化</Text>
           </TouchableOpacity>
         </View>
@@ -106,7 +58,7 @@ useEffect(() => {
   }, [navigation]);
 
   const showGraphPage = () => {
-    navigation.navigate('グラフ表示', {data: records});
+    navigation.navigate('グラフ表示');
   };
 
   const resetData = async () => {
@@ -135,6 +87,23 @@ useEffect(() => {
       {cancelable: false},
     );
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchRecords = async () => {
+        try {
+          const storedRecords = await AsyncStorage.getItem('records');
+          if (storedRecords !== null) {
+            setRecords(JSON.parse(storedRecords));
+          }
+        } catch (error) {
+          console.error('Failed to fetch records:', error);
+        }
+      };
+
+      fetchRecords();
+    }, []),
+  );
 
   React.useEffect(() => {
     const addNewRecord = async () => {
@@ -181,7 +150,7 @@ useEffect(() => {
     );
   };
 
-  const renderRightActions = (item) => {
+  const renderRightActions = (progress, dragX, item) => {
     const handleDelete = async () => {
       const updatedRecords = records.filter(record => record.id !== item.id);
       setRecords(updatedRecords);
@@ -314,6 +283,7 @@ const styles = StyleSheet.create({
 
   buttonText: {
     fontSize: 28,
+    fontWeight: 'bold',
     color: 'black',
   },
 
