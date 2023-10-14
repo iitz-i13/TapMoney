@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
@@ -28,49 +28,44 @@ const GraphPage = () => {
 
   const monthlyTotals = records.reduce((acc, record) => {
     const date = new Date(record.timestamp);
-    const monthIndex = date.getMonth() + 1;
+    const key = date.getMonth() + 1; // timestampをキーとして使用
     const amount = record.amount;
-    acc[monthIndex] = (acc[monthIndex] || 0) + Math.floor(amount);
+    if (!acc[key]) {
+      // その月の初めの記録なので金額を初期化
+      acc[key] = Math.floor(amount);
+    } else {
+      // 既に金額が設定されている場合、金額を加算
+      acc[key] += Math.floor(amount);
+    }
     return acc;
   }, {});
 
-  const accumulateTotals = (monthlyTotals) => {
-    let accumulated = 0;
-    const accumulatedTotals = {};
-    for (let i = 1; i <= 12; i++) {
-      accumulated += monthlyTotals[i] || 0;
-      accumulatedTotals[i] = accumulated;
-    }
-    return accumulatedTotals;
-  };
-
-  const accumulatedData = accumulateTotals(monthlyTotals);
-
-  const generateMonthLabels = (accumulatedData) => {
+  const generateMonthLabels = () => {
     const labels = [];
     for (let i = 1; i <= currentMonth; i++) {
-      if (accumulatedData[i] !== undefined) {
-        labels.push(`${i}`);
-      }
+      labels.push(`${i}`);
     }
     return labels;
   };
 
-  const generateDataArray = (accumulatedData) => {
-    const labels = generateMonthLabels(accumulatedData);
-    return labels.map((label) => accumulatedData[label]);
+  const generateDataArray = (monthlyTotals) => {
+    return generateMonthLabels().map((label) => {
+      const key = label;
+      return monthlyTotals[key] || 0;
+    });
   };
 
   const chartData = {
-    labels: generateMonthLabels(accumulatedData),
+    labels: generateMonthLabels(),
     datasets: [
       {
-        data: generateDataArray(accumulatedData),
+        data: generateDataArray(monthlyTotals),
+        color: (opacity = 1) => `black`,
+        strokeWidth: 3,
       },
-      // y = 0の直線を追加
       {
-        data: new Array(generateMonthLabels(accumulatedData).length).fill(0),
-        color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`,
+        data: new Array(currentMonth).fill(0),
+        color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`, // 赤色
         strokeWidth: 5,
         yLabelsSuffix: '0',
       },
@@ -84,12 +79,10 @@ const GraphPage = () => {
   const chartConfig = {
     backgroundGradientFrom: 'white',
     backgroundGradientTo: 'white',
-    decimalPlaces: 0, // 小数点 
+    decimalPlaces: 0,
+    fillShadowGradient: 'white',
     color: (opacity = 1) => `black`,
-    strokeWidth: 3,
-    gridColor: 'black', // 格子線の色を黒に設定
-    labelColor: (opacity = 1) => `black`, // ラベルの色を黒に設定
-    yAxisLabel: '0  5000  10000  15000  20000', // カスタムラベル
+    strokeWidth: 2,
   };
 
   return (
@@ -100,7 +93,6 @@ const GraphPage = () => {
         height={chartHeight}
         chartConfig={chartConfig}
         withShadow={false}
-        // yLabels={[0, 5000, 10000, 15000, 20000]}
         margin={{
           top: 5,
           right: 5,
@@ -113,7 +105,7 @@ const GraphPage = () => {
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate('金額入力')}>
-          <Text style={styles.buttonText}>金額入力へ</Text>
+          <Text style={styles.buttonText}>金額入力画面へ</Text>
         </TouchableOpacity>
       </View>
     </View>
