@@ -124,6 +124,22 @@ const CategorizePage = () => {
     });
   }, [showInput, navigation]);
 
+  // ページがロードされたときに属性項目をAsyncStorageから読み込む
+  useEffect(() => {
+    const loadItemsFromStorage = async () => {
+      try {
+        const storedItems = await AsyncStorage.getItem('items');
+        if (storedItems) {
+          setItems(JSON.parse(storedItems));
+        }
+      } catch (error) {
+        console.error('Failed to load items from storage:', error);
+      }
+    };
+
+    loadItemsFromStorage();
+  }, []);
+
   const deleteItem = async index => {
     const itemName = items[index].label; // 削除しようとしているアイテムの名前を取得
     Alert.alert(
