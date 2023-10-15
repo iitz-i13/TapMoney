@@ -103,9 +103,9 @@ const GraphPage = () => {
 
       <View style={styles.footer}>
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button, { backgroundColor: 'lightgrey' }]}
           onPress={() => navigation.navigate('金額入力')}>
-          <Text style={styles.buttonText}>金額入力画面へ</Text>
+          <Text style={styles.buttonText}>金額入力へ</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   button: {
     width: '100%',
     padding: 20,
-    backgroundColor: '#CCFFCC',
+    backgroundColor: '#lightgray',
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
@@ -133,6 +133,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: 'lightgray',
+    backgroundColor: '#lightgray',
   },
 });
 
