@@ -127,7 +127,7 @@ const CategorizePage = () => {
   const deleteItem = async index => {
     const itemName = items[index].label; // 削除しようとしているアイテムの名前を取得
     Alert.alert(
-      '確認', // タイトル
+      '確認', // タイトル表示
       `${itemName}を削除してもよろしいですか？`, // メッセージ
       [
         {
