@@ -241,7 +241,7 @@ const ResultPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'lightgrey',
+    backgroundColor: 'white',
   },
 
   headerRow: {
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   button: {
     width: '100%',
     padding: 20,
-    backgroundColor: '#FF773E',
+    backgroundColor: 'lightgray', // ヘッダーボタン
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
 
   buttonText: {
     fontSize: 28,
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
     color: 'black',
   },
 
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     padding: 12,
     width: '100%',
     borderBottomWidth: 1,
-    borderBottomColor: 'lightgray',
+    borderBottomColor: 'white',
   },
 
   leftGroup: {
